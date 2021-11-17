@@ -1,0 +1,18 @@
+<div class="panel panel-default">
+    <div class="panel-heading">Other Inspections for {{theVehicle?.remoteId || '(unspecified)'}}</div>
+    <div class="panel-body no-padding override-child-dataTable-margin" *ngIf="tableColumns.length > 0">
+        <sa-datatable [options]="options" [dataTableColumns]="tableColumns" [dataTableId]="tableName"
+            (selectedColumnsToSave)="saveSelectedColumns($event)"
+            tableClass="table table-striped table-bordered table-hover" #inspectionsForTable>
+            <thead>
+                <tr>
+                    <th class="col-sm-3">Inspection Num</th>
+                    <th class="col-sm-3">Driver</th>
+                    <th class="col-sm-3">Created&nbsp;At</th>
+                    <th class="col-sm-2">Defects</th>
+                    <th class="col-sm-1">Type</th>
+                </tr>
+            </thead>
+        </sa-datatable>
+    </div>
+</div>

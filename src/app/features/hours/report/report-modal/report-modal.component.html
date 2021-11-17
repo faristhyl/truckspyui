@@ -1,0 +1,350 @@
+<div class="modal-content">
+  <div class="modal-header bg-primary">
+    <button type="button" class="close" (click)="onCloseReportModal()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title">{{reportModalData.name}}</h4>
+  </div>
+  <div class="modal-body">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xs-12 col-md-12 col-lg-12">
+          {{reportModalData.description}}
+        </div>
+      </div>
+      <div class="row">
+        <div *ngFor="let para of reportModalData.parameters; index as i" [class]="para.class">
+          <div *ngIf="para.name === 'userId' && para.isShow">
+            <label for="driver">Drivers</label>
+            <select style="width: 100%;" class="form-control" name="driver" id="driverName" [(ngModel)]="para.value"
+              (ngModelChange)="onDriverChange()">
+              <option value="all" selected>All Drivers</option>
+              <option *ngFor="let d of drivers" [value]="d.id">{{ d.name() }}</option>
+            </select>
+          </div>
+          <div *ngIf="para.name === 'assetId' && para.isShow">
+            <label for="vehicle">Vehicle</label>
+            <ng-select style="width: 93%; position: absolute;" [items]="vehicles" bindLabel="name" bindValue="id"
+              appendTo="body" [multiple]="para.isMulti" [closeOnSelect]="!para.isMulti" placeholder="All Vehicles"
+              (change)="onAssetChange()" name="vehicle" [(ngModel)]="para.value">
+              <ng-template ng-header-tmp *ngIf="para.isMulti">
+                <div>
+                  <button class="btn btn-link" (click)="onSelectAllVehicles(i)">Select All</button>
+                </div>
+              </ng-template>
+              <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+                <app-ng-select-custom-template bindLabelName="name" [items]="items" [clear]="clear">
+                </app-ng-select-custom-template>
+              </ng-template>
+            </ng-select>
+          </div>
+          <div *ngIf="para.name === 'terminalId' && para.isShow">
+            <label for="terminal">Terminals</label>
+            <select style="width: 100%;" class="form-control" name="terminal" id="terminalName" [(ngModel)]="para.value"
+              [disabled]="isDisabledTerminal" (ngModelChange)="onTerminalChange()">
+              <option value="all" selected>All Terminals</option>
+              <option *ngFor="let t of terminals" [value]="t.id">{{ t.name }}</option>
+            </select>
+          </div>
+          <div *ngIf="para.name === 'specialMoves' && para.isShow">
+            <label for="specialMoves">Special Moves</label>
+            <select style="width: 100%;" class="form-control" name="specialMoves" id="specialMovesName"
+              [(ngModel)]="para.value" (ngModelChange)="onSpecialMovesChange()">
+              <option value="all" selected>All</option>
+              <option value="personal_use">Perosnal Use</option>
+              <option value="yard_moves">Yard Moves</option>
+            </select>
+          </div>
+          <div *ngIf="para.name === 'documentType' && para.isShow">
+            <label for="documentsType">Documents Type</label>
+            <select style="width: 100%;" class="form-control" name="documentsType" id="documentsType"
+              [(ngModel)]="para.value">
+              <option value="all" selected>All</option>
+              <option *ngFor="let t of terminals" [value]="t.id">{{ t.name }}</option>
+            </select>
+          </div>
+          <div *ngIf="para.name === 'informationType' && para.isShow">
+            <label for="informationType">Information Type</label>
+            <select style="width: 100%;" class="form-control" name="informationType" id="informationType"
+              [(ngModel)]="para.value">
+              <option value="Driver">Information By Driver</option>
+              <option value="Vehicle">Information By Vehicle</option>
+            </select>
+          </div>
+          <div *ngIf="para.name === 'reportType' && para.isShow">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-xs-12">
+                  <label>Report</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                  <div class="radio">
+                    <input type="radio" id="allLogs" name="reportType" [(ngModel)]="para.value" value="all_logs"
+                      [checked]="para.value === 'all_logs'" (change)="onReportTypeChange()">
+                    <label for="allLogs">All Logs</label>
+                  </div>
+                  <div class="radio">
+                    <input type="radio" id="certified" name="reportType" [(ngModel)]="para.value" value="certified_logs"
+                      [checked]="para.value === 'certified_logs'" (change)="onReportTypeChange()">
+                    <label for="certified">Certified Logs</label>
+                  </div>
+                  <div class="radio">
+                    <input type="radio" id="uncertified" name="reportType" [(ngModel)]="para.value"
+                      value="uncertified_logs" [checked]="para.value === 'uncertified_logs'" (change)="onReportTypeChange()">
+                    <label for="uncertified">Uncertified Logs</label>
+                  </div>
+                  <div class="radio">
+                    <input type="radio" id="summary" name="reportType" [(ngModel)]="para.value" value="summary_logs"
+                      [checked]="para.value === 'summary_logs'" (change)="onReportTypeChange()">
+                    <label for="summary">Certified Logs Summary</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="para.name === 'dataTableCertifiedLog' && para.isShow">
+            <sa-datatable [options]="dataTableCertifiedLogOption" id="dataTableCertifiedLogTable"
+              #dataTableCertifiedLogTable tableClass="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th class="col-md-4">Driver</th>
+                  <th class="col-md-4">Date</th>
+                  <th class="col-md-4">Report</th>
+                </tr>
+              </thead>
+            </sa-datatable>
+          </div>
+          <div *ngIf="para.name === 'dataTableDocuments' && para.isShow">
+            <sa-datatable [options]="dataTableDocumentsOption" #dataTableDocumentsTable
+              tableClass="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th class="col-md-3">Driver</th>
+                  <th class="col-md-3">Date</th>
+                  <th class="col-md-3">Document Type</th>
+                  <th class="col-md-3">Document Reports</th>
+                </tr>
+              </thead>
+            </sa-datatable>
+          </div>
+          <div *ngIf="para.name === 'dataTableSpecialMoves' && para.isShow">
+            <sa-datatable [options]="dataTableSpecialMovesOption" #dataTableSpecialMovesTable
+              tableClass="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th class="col-md-4">Driver</th>
+                  <th class="col-md-4">Date</th>
+                  <th class="col-md-4">Special Moves</th>
+                </tr>
+              </thead>
+            </sa-datatable>
+          </div>
+          <div *ngIf="para.name === 'dataTableVehicleDailyUsageReport' && para.isShow">
+            <sa-datatable [options]="dataTableVehicleDailyUsageReportOption" #dataTableVehicleDailyUsageReportTable
+              tableClass="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th class="col-md-3">Vehicle Name</th>
+                  <th class="col-md-2">Vin</th>
+                  <th class="col-md-3">Driver Name</th>
+                  <th class="col-md-2">Date And Time</th>
+                  <th class="col-md-2">Status</th>
+                </tr>
+              </thead>
+            </sa-datatable>
+          </div>
+          <div *ngIf="para.name === 'reportTypeRadio' && para.isShow">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                  <label>Report Type</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                  <div [class]="radioBtnVerticalAlignRequired.includes(reportModalData.nameSlag)?'radio': 'radio-inline'">
+                    <input type="radio" id="details" name="reportType" [(ngModel)]="para.value" value="details"
+                      [checked]="para.value === 'details'">
+                    <label for="details">Details</label>
+                  </div>
+                  <div [class]="radioBtnVerticalAlignRequired.includes(reportModalData.nameSlag)?'radio': 'radio-inline'">
+                    <input type="radio" id="summary" name="reportType" [(ngModel)]="para.value" value="summary"
+                      [checked]="para.value === 'summary'">
+                    <label for="summary">Summary</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="para.name === 'usageType' && para.isShow">
+            <label for="usageType">Usage Type</label>
+            <select style="width: 100%;" class="form-control" name="usageType" id="usageTypeName"
+              [(ngModel)]="para.value">
+              <option value="Driver">Usage By Driver</option>
+              <option value="Vehicle">Usage By Vehicle</option>
+            </select>
+          </div>
+          <div *ngIf="para.name === 'usageDetected' && para.isShow">
+            <label for="usageDetected">Usage Detected</label>
+            <select style="width: 100%;" class="form-control" name="usageDetected" id="usageDetectedName"
+              [(ngModel)]="para.value">
+              <option value="1">Last Month</option>
+              <option value="2">Last 2 Month</option>
+              <option value="3">Last 3 Month</option>
+              <option value="4">Last 4 Month</option>
+              <option value="5">Last 5 Month</option>
+              <option value="6">Last 6 Month</option>
+              <option value="9">Last 9 Month</option>
+              <option value="12">Last Year</option>
+            </select>
+          </div>
+          <div *ngIf="para.name === 'documentTypeRadio' && para.isShow">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                  <label>Document Type</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-md-12 col-lg-12 margin-right-5">
+                  <div [class]="radioBtnVerticalAlignRequired.includes(reportModalData.nameSlag)?'radio': 'radio-inline'">
+                    <input type="radio" id="documentTypeRadioPdf" name="documentTypeRadio" [(ngModel)]="para.value"
+                      value="pdf" [checked]="para.value === 'pdf'">
+                    <label for="documentTypeRadioPdf">
+                      <i class="fa fa-file-pdf-o"></i> PDF
+                    </label>
+                  </div>
+                  <div [class]="radioBtnVerticalAlignRequired.includes(reportModalData.nameSlag)?'radio': 'radio-inline'">
+                    <input type="radio" id="documentTypeRadioExcel" name="documentTypeRadioExcel"
+                      [(ngModel)]="para.value" value="xls" [checked]="para.value === 'xls'">
+                    <label for="documentTypeRadioExcel">
+                      <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                    </label>
+                  </div>
+                  <div [class]="radioBtnVerticalAlignRequired.includes(reportModalData.nameSlag)?'radio': 'radio-inline'">
+                    <input type="radio" id="documentTypeRadioCsv" name="documentTypeRadioCsv" [(ngModel)]="para.value"
+                      value="csv" [checked]="para.value === 'csv'">
+                    <label for="documentTypeRadioCsv">
+                      <i class="fa fa-file-text" aria-hidden="true"></i> CSV
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="para.name === 'includeUnidentifiedDriversType' && para.isShow">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" [(ngModel)]="para.value">
+                <span>Include Unidentified Driving</span>
+              </label>
+            </div>
+          </div>
+          <div *ngIf="para.name === 'driverVehicleUnit' && para.isShow">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                  <label>Unit</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-md-12 col-lg-12 margin-right-5">
+                  <div [class]="radioBtnVerticalAlignRequired.includes(reportModalData.nameSlag)?'radio': 'radio-inline'">
+                    <input type="radio" id="driverVehicleUnitMiles" name="driverVehicleUnitMiles"
+                      (ngModelChange)="onDriverVehicleUnitChange()" [(ngModel)]="para.value" value="mi"
+                      [checked]="para.value === 'mi'">
+                    <label for="driverVehicleUnitMiles">Miles</label>
+                  </div>
+                  <div [class]="radioBtnVerticalAlignRequired.includes(reportModalData.nameSlag)?'radio': 'radio-inline'">
+                    <input type="radio" id="driverVehicleUnitKiloMeters" name="driverVehicleUnitKiloMeters"
+                      (ngModelChange)="onDriverVehicleUnitChange()" [(ngModel)]="para.value" value="km"
+                      [checked]="para.value === 'km'">
+                    <label for="driverVehicleUnitKiloMeters">Kilometers</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="para.name === 'driverReport' && para.isShow">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                  <label>Report</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-md-12 col-lg-12">
+                  <div class="radio">
+                    <input type="radio" id="driverReportLogs" name="driverReportLogs" [(ngModel)]="para.value"
+                      value="driver_logs" [checked]="para.value === 'driver_logs'">
+                    <label for="driverReportLogs">Driver Logs</label>
+                  </div>
+                  <div class="radio">
+                    <input type="radio" id="driverReportEditedLogs" name="driverReportEditedLogs"
+                      [(ngModel)]="para.value" value="edited_logs" [checked]="para.value === 'edited_logs'">
+                    <label for="driverReportEditedLogs">Edited Logs</label>
+                  </div>
+                  <div class="radio">
+                    <input type="radio" id="driverReportEditedLogsWithOriginals"
+                      name="driverReportEditedLogsWithOriginals" [(ngModel)]="para.value"
+                      value="edited_logs_with_original" [checked]="para.value === 'edited_logs_with_original'">
+                    <label for="driverReportEditedLogsWithOriginals">Edited Logs With Original</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="para.name === 'dateRange' && para.isShow">
+            <label for="selectDateRange">Date Range</label>
+            <div class="input-group">
+              <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+              </span>
+              <input [owlDateTimeTrigger]="dt" [owlDateTime]="dt" name="selectDateRange" [(ngModel)]="para.value"
+                [max]="filterOption.dateRange[1]" class="form-control" [selectMode]="'range'" #selectDateRange="ngModel"
+                (ngModelChange)="onDateRangeFilterChange()" />
+              <owl-date-time [pickerType]="'calendar'" #dt></owl-date-time>
+              <div *ngIf="selectDateRange.invalid" class="help-block text-danger">
+                <div class="small" *ngIf="selectDateRange.errors.owlDateTimeParse">
+                  Please select range
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="para.name === 'driverHistoryUpdateDataReasons' && para.isShow">
+            <label for="driverReason">Driver's Reason</label>
+            <select style="width: 100%;" class="form-control" name="driverReason" id="driverReason"
+              [(ngModel)]="para.value">
+              <option value="all" selected>All Reason</option>
+              <option *ngFor="let d of driverHistoryUpdateDataReasonArr" [value]="d">{{ d }}</option>
+            </select>
+          </div>
+          <div *ngIf="para.name === 'driverSelection' && para.isShow" class="margin-top-1">
+            <dual-list class="app-duallist" [display]="displayCapabilityPrivate" [source]="allDrivers"
+             [(destination)]="para.value" key="id" (destinationChange)="onDriverSelectionChanged()">
+            </dual-list>
+            <div class="clearfix text-danger margin-top-1" *ngIf="driverSelectionError">
+              <small>Please select driver</small>
+            </div>
+          </div>
+          <div *ngIf="para.name === 'instructions' && para.isShow">
+            <div>
+              <h3 class="text-capitalize"><b>{{para.name}}: </b></h3>
+            </div>
+            <ul>
+              <li *ngFor="let instruction of para.value" [innerHTML]="instruction"></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button *ngIf="reportModalData.isBtnShow" class="btn btn-primary margin-left-5 text-uppercase" type="button"
+      (click)="onReportModalExport()"
+      [disabled]="reportModalData.isbtnDisabled">{{reportModalData.exportBtnName}}</button>
+    <button class="btn btn-secondary" type="button" (click)="onCloseReportModal()">CLOSE</button>
+  </div>
+</div>

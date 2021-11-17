@@ -1,0 +1,131 @@
+<div id="content" class="panel panel-default">
+  <div class="panel-heading panel-heading-flex">
+    <b>Driver Violation</b>
+    <button class="btn btn-primary pull-right" (click)="downloadExcel()">Download Excel</button>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="dispatchGroup" id="dispatchGroup"
+          [(ngModel)]="filterOption.selectedDispatchGroupId" (ngModelChange)="onDispatchGroupFilterChange()"
+          [disabled]="!dispatchGroups.length">
+          <option value="all" selected>All Dispatch Groups</option>
+          <option *ngFor="let d of dispatchGroups" [value]="d.id">{{d.name}}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="driver" id="driverName"
+          [(ngModel)]="filterOption.selectedDriverId" (ngModelChange)="onDriverFilterChange()"
+          [disabled]="!drivers.length">
+          <option 
+            *ngIf="isNoComboboxDrivers()"
+            value="all" selected>No Drivers</option>
+          <option value="all" selected>All Drivers</option>
+          <option *ngFor="let d of drivers" [value]="d.id">{{ d.name() }}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="terminal" id="terminalName"
+          [(ngModel)]="filterOption.selectedTerminalId" (ngModelChange)="onTerminalFilterChange()"
+          [disabled]="filterOption.selectedDriverId !== 'all'|| !terminals.length">
+          <option value="all" selected>All Terminals</option>
+          <option *ngFor="let t of terminals" [value]="t.id">{{ t.name }}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="subset" id="subsetName"
+                [(ngModel)]="filterOption.selectedSubsetId" (ngModelChange)="refreshData()"
+                [disabled]="filterOption.selectedTerminalId === 'all' || !subsets.length ">
+          <option value="all" selected>All Subsets</option>
+          <option *ngFor="let s of subsets" [value]="s.id">{{ s.name }}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="violation" id="violationName"
+                [(ngModel)]="filterOption.selectedViolationId" (ngModelChange)="refreshData()" [disabled]="isNoComboboxDrivers()">
+          <option value="all" selected>All Violations</option>
+          <option *ngFor="let v of violations" [value]="v.id">{{ v.value }}</option>
+        </select>
+      </div>
+
+      <div class="input-group col-lg-3 col-md-3 col-sm-12 offset-lg-4 offset-md-4 col-12 w-100 w-md-75 w-lg-75 pull-right pr-13 pl-13 margin-top-10"
+           [ngClass]="{ 'has-error': selectDateRange.invalid }">
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+        <input [owlDateTimeTrigger]="dt" [owlDateTime]="dt" name="selectDateRange" [(ngModel)]="filterOption.dateRange"
+               [max]="currentDate" class="form-control" [selectMode]="'range'" #selectDateRange="ngModel"
+               (ngModelChange)="refreshData()">
+        <owl-date-time [pickerType]="'calendar'" #dt></owl-date-time>
+        <div *ngIf="selectDateRange.invalid" class="help-block text-danger">
+          <div class="small" *ngIf="selectDateRange.errors.owlDateTimeParse">Please select range
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      
+    </div>
+  </div>
+  <div class="row ">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+      <div>
+        <div class="row">
+          <div class="col-sm-12 col-md-12 col-lg-12 hos-fix-margins">
+            <sa-datatable [options]="driverVoilationOption" #driverViolationTable
+                          tableClass="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th class="col-sm-4">Date</th>
+                  <th class="col-sm-4">Driver</th>
+                  <th class="col-sm-2">Violation Type</th>
+                  <th class="col-sm-2">Documents & Notes</th>
+                </tr>
+              </thead>
+            </sa-datatable>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- upload file modal -->
+<ng-template class="modal-dialog" #docUploadModal>
+  <div class="modal-content">
+    <div class="modal-header bg-primary">
+      <button type="button" class="close" (click)="closeDocUploadModal()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h4 class="modal-title">File Upload</h4>
+    </div>
+    <form class="form-horizontal" #docFileUploadForm="ngForm"
+          (ngSubmit)="docFileUploadForm.form.valid && onUploadDocFile()">
+      <div class="modal-body">
+        <div class="col-12" [ngClass]="{ 'has-error': docFileUploadForm.submitted && docFileInput.invalid }">
+          <label for="driverHistoryDate">Please select file to upload</label>
+          <input type="file" name="uploadFile" id="driverHistoryDate" [(ngModel)]="uploadFileName"
+                 (change)="onDocFileChange($event)" #docFileInput="ngModel" required>
+          <div *ngIf="docFileUploadForm.submitted && docFileInput.invalid" class="help-block">
+            <div class="small" *ngIf="docFileInput.errors.required">Please select file
+            </div>
+          </div>
+        </div>
+        <div class="col-12 margin-top-10" [ngClass]="{ 'has-error': docFileUploadForm.submitted && noteInput.invalid }">
+          <label for="note">Add your note below</label>
+          <textarea class="form-control" id="note" name="note" [(ngModel)]="uploadData.note" autocomplete="nope"
+                    #noteInput="ngModel" required></textarea>
+          <div *ngIf="docFileUploadForm.submitted && noteInput.invalid" class="help-block">
+            <div class="small" *ngIf="noteInput.errors.required">Please add note
+            </div>
+          </div>
+        </div>
+        <div class="text-right margin-top-10">
+          <button type="submit" class="btn btn-primary text-uppercase">Upload</button>
+          <button type="button" class="btn btn-light text-uppercase" (click)="closeDocUploadModal()">close</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

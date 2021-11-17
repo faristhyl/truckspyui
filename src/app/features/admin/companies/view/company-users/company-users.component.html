@@ -1,0 +1,33 @@
+<div class="panel panel-default">
+    <div class="panel-heading">Users</div>
+    <div class="panel-body no-padding override-child-dataTable-margin">
+        <sa-datatable [options]="optionsCompanyUsers" tableClass="table table-striped table-bordered table-hover" #companyUsersTable>
+            <thead>
+                <tr>
+                    <th class="col-sm-4">Name</th>
+                    <th class="col-sm-5">Email</th>
+                    <th class="col-sm-3">Phone</th>
+                </tr>
+            </thead>
+            <thead class="filter-header">
+                <tr>
+                    <td class="filter-valuable">
+                        <div class="btn-group" style="width: 100%;">
+                            <input class="form-control" style="width: 100%;" placeholder="Name Search..." name="name"
+                                id="name" [(ngModel)]="filters.name" (ngModelChange)="onNameChanged()" type="text">
+                            <span class="fa fa-times message-search-clear" (click)="clearName()"></span>
+                        </div>
+                    </td>
+                    <td class="filter-valuable">
+                        <div class="btn-group" style="width: 100%;">
+                            <input class="form-control" style="width: 100%;" placeholder="Email Search..." name="email"
+                                id="email" [(ngModel)]="filters.email" (ngModelChange)="onEmailChanged()" type="text">
+                            <span class="fa fa-times message-search-clear" (click)="clearEmail()"></span>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+            </thead>
+        </sa-datatable>
+    </div>
+</div>

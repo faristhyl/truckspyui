@@ -1,0 +1,94 @@
+<div id="content" class="panel panel-default">
+  <div class="panel-heading">
+    <div class="panel-heading-flex">
+      <b>Last Reported Status</b>
+      <span class="pull-right">
+        <button class="btn btn-primary" (click)="downloadExcel()">Download Excel</button>
+      </span>
+    </div>
+    <div>
+      <small>Note: For the newly created drivers to be displayed it is required to logout and login back</small>
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="row row-wrap filter">
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="dispatchGroup" id="dispatchGroup"
+          [(ngModel)]="filterOption.selectedDispatchGroupId" (ngModelChange)="onDispatchGroupFilterChange()"
+          [disabled]="!dispatchGroups.length">
+          <option value="all" selected>All Dispatch Groups</option>
+          <option *ngFor="let d of dispatchGroups" [value]="d.id">{{d.name}}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="driver" id="driverName"
+          [(ngModel)]="filterOption.selectedDriverId" (ngModelChange)="onDriverFilterChange()"
+          [disabled]="!drivers.length">
+          <option 
+            *ngIf="filterOption.selectedDriverIds 
+                    && !filterOption.selectedDriverIds.length 
+                    && filterOption.selectedDispatchGroupId !== 'all'" 
+            value="all" selected>No Drivers</option>
+          <option value="all" selected>All Drivers</option>
+          <option *ngFor="let d of drivers" [value]="d.id">{{ d.name() }}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="terminal" id="terminalName"
+          [(ngModel)]="filterOption.selectedTerminalId" (ngModelChange)="onTerminalFilterChange()"
+          [disabled]="filterOption.selectedDriverId !== 'all'|| !terminals.length">
+          <option value="all" selected>All Terminals</option>
+          <option *ngFor="let t of terminals" [value]="t.id">{{ t.name }}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="subset" id="subsetName"
+          [(ngModel)]="filterOption.selectedSubsetId" (ngModelChange)="refreshData()"
+          [disabled]="filterOption.selectedTerminalId === 'all' || !subsets.length ">
+          <option value="all" selected>All Subsets</option>
+          <option *ngFor="let s of subsets" [value]="s.id">{{ s.name }}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="status" id="statusName"
+          [(ngModel)]="filterOption.selectedStatus" (ngModelChange)="refreshData()">
+          <option value="" selected>All</option>
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12 hos-fix-margins" *ngIf="tableColumns.length > 0">
+      <sa-datatable [options]="driversOption" [dataTableColumns]="tableColumns"
+        (selectedColumnsToSave)="saveSelectedColumns($event)" #driversTable
+        tableClass="table table-striped table-bordered table-hover">
+        <thead>
+          <tr>
+            <!-- Important: Setting up min-width here for headers since non-responsive datatables have problems with header resizing -->
+            <th style="min-width: 85px;">Driver ID</th>
+            <th style="min-width: 90px;">Driver Name</th>
+            <th style="min-width: 75px;">Vehicle</th>
+            <th style="min-width: 80px;">Status</th>
+            <th style="min-width: 100px;">Last Contact</th>
+            <th style="min-width: 120px;">Last Position</th>
+            <th style="min-width: 110px;">Current Ruleset</th>
+            <th style="min-width: 60px;">Until Break</th>
+            <th style="min-width: 60px;">Drive Left</th>
+            <th style="min-width: 60px;">Shift Left</th>
+            <th style="min-width: 60px;">Cycle Left</th>
+            <th style="min-width: 120px;">Gain Time At</th>
+            <th style="min-width: 110px;">Time Gained</th>
+            <th style="min-width: 110px;">Time Gained at StartOfDay</th>
+            <th style="min-width: 110px;">Next Violation</th>
+            <th style="min-width: 90px;">Time of Next Violation</th>
+            <th style="min-width: 70px;">Uncertified Logs</th>
+            <th style="min-width: 60px;">Pending Edits</th>
+            <th style="min-width: 90px;">Violation</th>
+          </tr>
+        </thead>
+      </sa-datatable>
+    </div>
+  </div>
+</div>

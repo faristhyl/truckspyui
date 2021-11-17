@@ -1,0 +1,237 @@
+<div id="content">
+    <div class="row">
+        <sa-big-breadcrumbs [items]="['Devices', device.iccid]" icon="tablet"
+                            class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+        </sa-big-breadcrumbs>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-sm-7 panel-heading-title">
+                            Device Information
+                        </div>
+                        <div class="col-sm-5">
+                            <div dropdown>
+                                <button type="button" class="btn btn-xs btn-default dropdown-btn pull-right" dropdownToggle [disabled]="!deviceActions">
+                                    <span class="dropdown-text">Actions</span><span class="caret"></span>
+                                </button>
+                                <ul *dropdownMenu class="dropdown-menu pull-right js-status-update" >
+                                    <li *ngFor="let action of deviceActions" role="menuitem">
+                                        <a class="dropdown-item" (click)="initConfirmActionModal(action)">
+                                            {{ action }}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-5">Device ID</label>
+                            <label class="col-sm-7">{{device.iccid}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Serial Number</label>
+                            <label class="col-sm-7">{{device.serialNumber}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Status</label>
+                            <label class="col-sm-7">
+                                {{device.status}}
+                                &nbsp;
+                                <a class="action-link" (click)="deactivate(deactivateModal)" *ngIf="device.id && device.isActive()">
+                                    Deactivate
+                                </a>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Op Status</label>
+                            <label class="col-sm-7">{{device.operationalStatus | replaceUnderscore}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Created At</label>
+                            <label class="col-sm-7">
+                                {{device.createdAt | timezoneHandler | date : 'yyyy-MM-dd, HH:mm:ss'}}
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">IMEI</label>
+                            <label class="col-sm-7">{{device.imei}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Reporting Profile</label>
+                            <label class="col-sm-7">
+                                <span *ngIf="device.reportingProfile && device.reportingProfile.id">
+                                  {{device.reportingProfile.name}}
+                                </span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Software Version</label>
+                            <label class="col-sm-7">{{device.softwareVersion}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Last Vehicle</label>
+                            <label class="col-sm-7">
+                                <span *ngIf="device.lastVehicle && device.lastVehicle.id">
+                                  {{device.lastVehicle.remoteId || '(unspecified)'}}
+                                </span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Last Communication</label>
+                            <label class="col-sm-7">
+                                {{
+                                    device.lastCommunication | timezoneHandler | date : 'yyyy-MM-dd, HH:mm:ss'
+                                }}
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Connected</label>
+                            <label class="col-sm-7">{{device.iccid && device.isConnected()}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Data Error</label>
+                            <label class="col-sm-7">
+                                {{
+                                    (device.lastVehicle && device.lastVehicle.dataErrorAt)
+                                    | timezoneHandler | date : 'yyyy-MM-dd, HH:mm:ss'
+                                }}
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Force To Vehicle</label>
+                            <label class="col-sm-7">
+                                <ng-container *ngIf="device.forceToVehicle && device.forceToVehicle.id">
+                                    <a href="#/vehicles/{{device.forceToVehicle.id}}/view">
+                                        {{device.forceToVehicle.remoteId || '(unspecified)'}}
+                                    </a>
+                                    &nbsp;
+                                </ng-container>
+                                <a class="action-link" (click)="editForce(editForceModal)" *ngIf="vehiclesLoaded">
+                                    {{
+                                        (!!device.forceToVehicle && !!device.forceToVehicle.id) ? 'Edit' : 'Assign'
+                                    }}
+                                </a>
+                                &nbsp;
+                                <ng-container *ngIf="device.forceToVehicle && device.forceToVehicle.id">
+                                    <app-long-action-link [actionName]="'Remove'" [actionParams]="[]"
+                                        (actionClicked)="removeForceToVehicle($event[0])">
+                                    </app-long-action-link>
+                                </ng-container>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-md-12 col-lg-8">
+            <app-admin-device-events></app-admin-device-events>
+        </div>
+    </div>
+</div>
+
+<ng-template #deactivateModal>
+    <div class="modal-header">
+        <button type="button" class="close" (click)="closeDeactivateModal()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Deactivate Device</h4>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" #deactivateForm="ngForm"
+            (ngSubmit)="deactivateForm.form.valid && doDeactivate()">
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <span class="badge bg-color-red">
+                        <i class="fa-fw fa fa-warning"></i>
+                    </span>
+                    Are you sure? Once you deactivate the device it will be completely wiped of data and will no longer be able to connect to the cellular network.
+                    This action will render the device useless and cannot be undone.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-4" for="deviceId">Type the device Id:</label>
+                <div class="col-sm-8" [ngClass]="{ 'has-error': deactivateForm.submitted && !actionConfirmed }">
+                    <input type='text' name="deviceId" style="width: 100%" [(ngModel)]="deactivateData.deviceIdConfirmation"
+                        (ngModelChange)="confirmationListener($event)">
+
+                    <div *ngIf="deactivateForm.submitted && !actionConfirmed" class="help-block">
+                        <div class="small" *ngIf="!actionConfirmed">Confirm action by typing the device Id</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <a class="btn btn-default pull-left" (click)="closeDeactivateModal()">Nevermind</a>
+                <button class="btn btn-danger pull-right" type="submit">Deactivate</button>
+                <div class="clearfix"></div>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+<ng-template #editForceModal>
+    <div class="modal-header">
+        <button type="button" class="close" (click)="closeEditForceModal()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Force To Vehicle</h4>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" #editForceForm="ngForm"
+            (ngSubmit)="editForceForm.form.valid && doEditForce()">
+            <div class="form-group">
+                <label class="col-sm-3" for="vehicle" style="padding-top: 7px;">Force To</label>
+                <div class="col-sm-9">
+                    <select style="width: 100%;" data-select-search="true" select2 name="vehicle" [(ngModel)]="editForceData.vehicleId"
+                        (changedAction)="vehicleChanged($event)" [chooseOnTab]="true">
+                        <option *ngFor="let vehicle of vehicles" [value]="vehicle.id">
+                            {{vehicle.remoteId || "(unspecified)"}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <button class="btn btn-primary" type="submit">Save</button>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+<div bsModal #confirmActionModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-400">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="closeConfirmActionModal()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">{{selectedAction}}</h4>
+            </div>
+            <div class="modal-body">
+                <ng-container [ngSwitch]="selectedAction">
+                    <!-- <ng-container *ngSwitchCase="deviceAction.WIPE_DEVICE">Are you sure you want to <b>wipe</b> this device?</ng-container> -->
+                    <ng-container *ngSwitchCase="deviceAction.ENABLE_LOST_MODE">Are you sure you want to <b>enable Lost Mode</b> for this device?</ng-container>
+                    <ng-container *ngSwitchCase="deviceAction.DISABLE_LOST_MODE">Are you sure you want to <b>disable Lost Mode</b> for this device?</ng-container>
+                    <ng-container *ngSwitchCase="deviceAction.POWER_OFF">Are you sure you want to <b>power off</b> this device?</ng-container>
+                    <ng-container *ngSwitchCase="deviceAction.RESTART">Are you sure you want to <b>restart</b> this device?</ng-container>
+                </ng-container>
+                <br/><br/>
+
+                <div class="text-right">
+                    <button class="btn btn-primary" (click)="confirmAction()">Yes</button>
+                    &nbsp;
+                    <button class="btn btn-default" (click)="closeConfirmActionModal()">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

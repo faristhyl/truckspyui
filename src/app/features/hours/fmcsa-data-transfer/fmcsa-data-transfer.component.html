@@ -1,0 +1,130 @@
+<div id="content" class="panel panel-default">
+  <div class="panel-heading">
+    <b>FMCSA Data Transfer</b>
+    <div>
+      <small>Note: For ELD Vehicles only</small>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <div class="row clearfix">
+      <div class="col-lg-5 col-md-8 col-sm-12 col-xs-12 col-lg-offset-3 col-md-offset-2">
+        <div class="card bg-light bg-color-white padding-10">
+          <div class="card-body">
+            <form name="fmcsaDataTransfer" #fmcsaDataTransferForm="ngForm" (ngSubmit)="onFMCSASubmit()" novalidate>
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                  <ng-select [items]="drivers" bindLabel="fullName" bindValue="id" [multiple]="true"
+                    [closeOnSelect]="false" placeholder="All Drivers" (change)="onDriverChange()" name="driver"
+                    [(ngModel)]="filterOption.selectedDriverId" required>
+                    <ng-template ng-header-tmp>
+                      <div>
+                        <button type="button" class="btn btn-link" (click)="onSelectAllDrivers()">Select All</button>
+                      </div>
+                    </ng-template>
+                    <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+                      <app-ng-select-custom-template bindLabelName="fullName" [items]="items" [clear]="clear">
+                      </app-ng-select-custom-template>
+                    </ng-template>
+                  </ng-select>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-12 margin-top-10 margin-bottom-10">
+                  <ng-select [items]="vehicles" bindLabel="name" bindValue="id" [multiple]="true"
+                    [closeOnSelect]="false" placeholder="All Vehicles" name="vehicle" [disabled]="isVehicleDisabled"
+                    [(ngModel)]="filterOption.selectedVehicleId" required>
+                    <ng-template ng-header-tmp>
+                      <div>
+                        <button type="button" class="btn btn-link" (click)="onSelectAllVehicles()">Select All</button>
+                      </div>
+                    </ng-template>
+                    <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+                      <app-ng-select-custom-template bindLabelName="name" [items]="items" [clear]="clear">
+                      </app-ng-select-custom-template>
+                    </ng-template>
+                  </ng-select>
+                </div>
+                <div class="input-group col-sm-12 col-md-12 col-lg-12 padding-10  margin-top-10"
+                  [ngClass]="{ 'has-error': selectDateRange.invalid }">
+                  <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                  </span>
+                  <input [owlDateTimeTrigger]="dt" [owlDateTime]="dt" name="selectDateRange"
+                    [max]="filterOption.dateRange[1]" [(ngModel)]="filterOption.dateRange" class="form-control"
+                    [selectMode]="'range'" #selectDateRange="ngModel" required />
+                  <owl-date-time [pickerType]="'calendar'" #dt></owl-date-time>
+                  <div *ngIf="selectDateRange.invalid" class="help-block text-danger">
+                    <div class="small" *ngIf="selectDateRange.errors.owlDateTimeParse">
+                      Please select range
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-12 margin-top-10 margin-bottom-10">
+                  <label for="comment">Comment</label>
+                  <input type="text" style="width: 100%;" name="comment" id="comment"
+                    [(ngModel)]="filterOption.comment" maxlength="60" placeholder="Type your comment here..."
+                    required />
+                  <div>
+                    <small>You have {{60 - filterOption.comment.length}} characters left.</small>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 margin-top-10">
+                  <button type="button" class="btn btn-primary" [disabled]="isDownloadBtnDisabled"
+                    (click)="onDownloadCSV()">
+                    Download CSV Button
+                  </button>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 margin-top-10">
+                  <button type="submit" class="btn btn-primary">
+                    Submit To FMCSA
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FMCSA submit Modal -->
+<ng-template class="modal-dialog" #fmcsaSubmitModal>
+  <div class="modal-content">
+    <div class="modal-body">
+      <div *ngIf="multiSubmitResponse.length > 0; else errorInMultiSubmit">
+        <div *ngFor="let multi of multiSubmitResponse">
+          <div class="alert"
+            [ngClass]="{'alert-warning': multi.fmcsaResponse.status === 'Error',
+            'alert-success': multi.fmcsaResponse.status !== 'Error'}"
+            role="alert">
+            <div *ngIf="multi.fmcsaResponse.status === 'Error'; else successSubmit">
+              <b>
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                Driver {{multi.driverName}}
+              </b>
+              has no certified logs to transfer for the selected date range.
+            </div>
+            <ng-template #successSubmit>
+              <b>
+                <i class="fa fa-check" aria-hidden="true"></i>
+                Driver {{multi.driverName}}
+              </b>
+              FMCSA Submit Success
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <ng-template #errorInMultiSubmit>
+        <div class="alert alert-warning" role="alert">
+          <i class="fa fa-info-circle" aria-hidden="true"></i>
+          FMCSA Submit Failed
+        </div>
+      </ng-template>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="onCloseFmcsaSubmitModal()">OK</button>
+    </div>
+  </div>
+</ng-template>

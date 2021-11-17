@@ -1,0 +1,100 @@
+<div id="content">
+    <div class="row">
+        <sa-big-breadcrumbs [items]="['Linehaul Trips']" icon="road" class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+        </sa-big-breadcrumbs>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="pull-right">
+                        <div class="input-group" [ngClass]="{ 'has-error': selectDateRange.invalid }" style="max-width: 300px;">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                            <input [owlDateTimeTrigger]="dt" [owlDateTime]="dt" name="selectDateRange" [(ngModel)]="dateTimeRange"
+                                (dateTimeChange)="onDateRangeChange($event)" class="form-control" [selectMode]="'range'"
+                                #selectDateRange="ngModel" placeholder="Select date range...">
+                            <owl-date-time [pickerType]="'calendar'" #dt></owl-date-time>
+                            <div *ngIf="selectDateRange.invalid" class="help-block text-danger">
+                                <div class="small" *ngIf="selectDateRange.errors.owlDateTimeParse">Please select range</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-body no-padding override-child-dataTable-margin" *ngIf="tableColumns.length > 0">
+                    <sa-datatable [options]="options" [dataTableColumns]="tableColumns" (selectedColumnsToSave)="saveSelectedColumns($event)" #linehaulTripsTable
+                        tableClass="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="col-sm-1">Trip&nbsp;Number</th>
+                                <th class="col-sm-2">Entity&nbsp;Id</th>
+                                <th class="col-sm-2">Date</th>
+                                <th class="col-sm-1">Vehicle</th>
+                                <th class="col-sm-2">Drivers</th>
+                                <th class="col-sm-2">Origin</th>
+                                <th class="col-sm-2">Destination</th>
+                                <th class="col-sm-1">Miles&nbsp;Qty</th>
+                                <th class="col-sm-1">Total&nbsp;Rate</th>
+                                <th class="col-sm-1">Flat&nbsp;Rate</th>
+                                <th class="col-sm-1">D&H</th>
+                                <th class="col-sm-1">Total&nbsp;Amount</th>
+                            </tr>
+                        </thead>
+                        <thead class="filter-header">
+                            <tr>
+                                <td></td>
+                                <td class="filter-valuable">
+                                  <select style="width: 100%" data-select-search="true" select2 name="entityId"
+                                          [(ngModel)]="filters.entityId" (changedAction)="onEntityChanged($event)"
+                                          [chooseOnTab]="true" [disabled]="!entities.length">
+                                    <option style="color: lightgray" value="">
+                                      All Entities
+                                    </option>
+                                    <option *ngFor="let entity of entities" [value]="entity">
+                                      {{ entity }}
+                                    </option>
+                                  </select>
+                                </td>
+                                <td></td>
+                                <td class="filter-valuable">
+                                  <select style="width: 100%" data-select-search="true" select2 name="remoteId"
+                                      [(ngModel)]="filters.vehicleRemoteId" (changedAction)="onVehicleChanged($event)"
+                                      [chooseOnTab]="true" [disabled]="!vehicles.length">
+                                      <option style="color: lightgray" value="">
+                                          All Vehicles
+                                      </option>
+                                      <option *ngFor="let vehicle of vehicles" [value]="vehicle.remoteId">
+                                          {{ vehicle.remoteId }}
+                                      </option>
+                                  </select>
+                                </td>
+                                <td class="filter-valuable">
+                                  <select style="width: 100%" data-select-search="true" select2 name="driverRemoteId"
+                                      [(ngModel)]="filters.driverRemoteId" (changedAction)="onDriverChanged($event)"
+                                      [chooseOnTab]="true" [disabled]="!drivers.length">
+                                      <option style="color: lightgray" value="">
+                                          All Drivers
+                                      </option>
+                                      <option *ngFor="let driver of drivers" [value]="driver.remoteId">
+                                          {{ driver.firstName + ' ' + driver.lastName }}
+                                      </option>
+                                  </select>
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                    </sa-datatable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

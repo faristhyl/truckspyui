@@ -1,0 +1,107 @@
+<div id="content" class="panel panel-default">
+  <div class="panel-heading panel-heading-flex">
+    <b>Malfunctions & Data Diagnosis</b>
+    <button class="btn btn-primary" (click)="downloadExcel()">Download Excel</button>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-lg-3 col-md-3 col-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="eventType" id="eventType"
+          [(ngModel)]="filterOption.eventType" (ngModelChange)="getEventsByEventType()">
+          <option value="all" selected>All</option>
+          <option *ngFor="let e of eventTypeArr" [value]="e.id">
+            {{ e.name }}
+          </option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="eventSpecificType" id="eventSpecificType"
+          [(ngModel)]="filterOption.eventSpecificType" (ngModelChange)="refreshData()"
+          [disabled]="filterOption.eventType === 'all'">
+          <option value="all" selected>All Events</option>
+          <option *ngFor="let e of eventSpecificTypeArr" [value]="e.id">
+            {{ e.name }}
+          </option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-12 filter-field">
+        <input class="form-control" name="remarkFilter" type="text" [(ngModel)]="filterOption.remarkDescription"
+          (change)="refreshData()" placeholder="Remarks Filter">
+      </div>
+      <div class="col-lg-3 col-md-3 col-12 w-100 filter-field">
+        <div class="input-group" [ngClass]="{ 'has-error': selectDateRange.invalid }">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+          <input [owlDateTimeTrigger]="dt" [owlDateTime]="dt" name="selectDateRange" [(ngModel)]="filterOption.dateRange"
+            [max]="currentDate" class="form-control" [selectMode]="'range'" #selectDateRange="ngModel"
+            (ngModelChange)="refreshData()" />
+          <owl-date-time [pickerType]="'calendar'" #dt></owl-date-time>
+          <div *ngIf="selectDateRange.invalid" class="help-block text-danger">
+            <div class="small" *ngIf="selectDateRange.errors.owlDateTimeParse">
+              Please select range
+            </div>
+          </div>
+        </div> 
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <!-- all status -->
+        <select style="width: 100%;" class="form-control"  name="driver" id="stateName"
+          [(ngModel)]="filterOption.isCleared" (ngModelChange)="refreshData()" [disabled]="!clearedArr.length">
+          <option value="all" selected>All Status</option>
+          <option *ngFor="let c of clearedArr" [value]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="dispatchGroup" id="dispatchGroup"
+          [(ngModel)]="filterOption.selectedDispatchGroupId" (ngModelChange)="onDispatchGroupFilterChange()"
+          [disabled]="!dispatchGroups.length">
+          <option value="all" selected>All Dispatch Groups</option>
+          <option *ngFor="let d of dispatchGroups" [value]="d.id">{{d.name}}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <select style="width: 100%;" class="form-control" name="driver" id="driverName"
+          [(ngModel)]="filterOption.selectedDriverId" (ngModelChange)="onDriverFilterChange()" [disabled]="!drivers.length">
+          <option *ngIf="isNoComboboxDrivers()" value="all" selected>No Drivers</option>
+          <option value="all" selected>All Drivers</option>
+          <option *ngFor="let d of drivers" [value]="d.id">{{ d.name() }}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 filter-field">
+        <ng-select class="w-100 vehicle-select" [items]="vehicles" bindLabel="name" bindValue="id" [multiple]="true" [closeOnSelect]="false"
+          placeholder="All Vehicles" [(ngModel)]="filterOption.selectedVehicleId" (change)="refreshData()" [disabled]="isNoComboboxDrivers()">
+          <ng-template ng-header-tmp>
+            <div>
+              <button class="btn btn-link" (click)="onSelectAllVehicles()">Select All</button>
+            </div>
+          </ng-template>
+          <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+            <app-ng-select-custom-template bindLabelName="name" [items]="items" [clear]="clear">
+            </app-ng-select-custom-template>
+          </ng-template>
+        </ng-select>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12 hos-fix-margins">
+      <sa-datatable [options]="malfunctionsOption" #malfunctionsTable
+      tableClass="table table-striped table-bordered table-hover">
+        <thead>
+          <tr>
+            <th class="col-sm-1 text-center">Date/Time</th>
+            <th class="col-sm-2 text-center">Event</th>
+            <th class="col-sm-2 text-center">Vin</th>
+            <th class="col-sm-2 text-center">Vehicle</th>
+            <th class="col-sm-2 text-center">Driver</th>
+            <th class="col-sm-2 text-center">Remark</th>
+            <th class="col-sm-1 text-center">Status</th>
+          </tr>
+        </thead>
+      </sa-datatable>
+    </div>
+  </div>
+</div>

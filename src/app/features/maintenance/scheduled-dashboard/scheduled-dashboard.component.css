@@ -1,0 +1,101 @@
+.p-0 {
+    padding: 0;
+}
+
+.m-0 {
+    margin: 0;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.bd-top-1 {
+    border-top: 1px !important;
+}
+
+.width-100px {
+    width: 100px !important;
+    min-width: 100px !important;
+}
+
+.inner-table {
+    border-top: 0;
+    height: 100%;
+}
+
+.inner-table td {
+    border-top: 0;
+}
+
+.table-responsive {
+    max-height: calc(100vh - 200px);
+}
+
+table td, th {
+    min-width: 200px;
+    height: 1px;
+    min-height: 1px;
+}
+
+table tr {
+    width: 100%;
+    border-top: 1px solid #ddd;
+}
+
+.filter-block {
+    margin-bottom: 30px;
+    background-color: #fff;
+    padding: 20px;
+}
+
+.filter-block-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.sort-title {
+    width: 100%;
+    position: relative;
+    padding-right: 17px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.sort-icon {
+    position: absolute;
+    right: 5px;
+    top: calc(50% - 6px);
+    height: 12px;
+    width: 12px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.value-td {
+    padding-bottom: 22px;
+    position: relative;
+}
+
+.value-td .update-date {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    font-size: 10px;
+    font-style: italic;
+}
+
+.table-container {
+    position: relative;
+    padding-top: 103px;
+    overflow: hidden;
+}
+
+.table-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-right: 18px;
+}

@@ -1,0 +1,98 @@
+<div id="content">
+    <div class="row">
+        <sa-big-breadcrumbs [items]="['Companies', company.entityName]" icon="building"
+            class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+        </sa-big-breadcrumbs>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Company Information
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-5">Entity Name</label>
+                            <label class="col-sm-7">{{company.entityName}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Entity Identifier</label>
+                            <label class="col-sm-7">{{company.entityIdentifier}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Report End Day</label>
+                            <label class="col-sm-7">{{company.reportPeriodEnd}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5">Report Timezone</label>
+                            <label class="col-sm-7">{{company.reportTimeZone}}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="pull-left">Vehicles</div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-body no-padding override-child-dataTable-margin">
+                    <sa-datatable [options]="options" tableClass="table table-striped table-bordered table-hover"
+                        #vehiclesTable>
+                        <thead>
+                            <tr>
+                                <th class="col-sm-2">Vehicle</th>
+                                <th class="col-sm-2">Status</th>
+                                <th class="col-sm-2">Domicile</th>
+                                <th class="col-sm-3">Last Communication</th>
+                                <th class="col-sm-3">Data Through</th>
+                            </tr>
+                        </thead>
+                        <thead class="filter-header">
+                            <tr>
+                                <td class="filter-valuable">
+                                    <div class="btn-group" style="width: 100%;">
+                                        <input class="form-control" style="width: 100%;" placeholder="Vehicle Search..."
+                                            name="remoteId" id="remoteId" [(ngModel)]="filters.remoteId"
+                                            (ngModelChange)="onRemoteIdChanged($event)" type="text">
+                                        <span class="fa fa-times message-search-clear" (click)="clearVehicle()"></span>
+                                    </div>
+                                </td>
+                                <td class="filter-valuable">
+                                    <select style="width: 100%" data-select-search="true" select2 name="status"
+                                        [(ngModel)]="filters.status" (changedAction)="onStatusChanged($event)"
+                                        [chooseOnTab]="true" [disabled]="!statuses">
+                                        <option style="color: lightgray" value="">
+                                            All Statuses
+                                        </option>
+                                        <option *ngFor="let s of statuses" [value]="s">
+                                            {{s}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td class="filter-valuable">
+                                    <select style="width: 100%" data-select-search="true" select2 #locationSelect2
+                                        name="locationId" [(ngModel)]="filters.domicileLocationId"
+                                        (changedAction)="onLocationsChanged($event)" [chooseOnTab]="true"
+                                        [disabled]="!locations || locations.length === 0">
+                                        <option style="color: lightgray" value="">
+                                            All Domicile
+                                        </option>
+                                        <option *ngFor="let l of locations" [value]="l.id">
+                                            {{l.name}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                    </sa-datatable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

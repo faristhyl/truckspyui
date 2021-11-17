@@ -1,0 +1,91 @@
+::ng-deep .pager li>a {
+  border-radius: 0px;
+  background-color: #73bcf5;
+  color: white;
+  font-size: 14px;
+}
+
+::ng-deep .pager li>a:hover {
+  text-decoration: none;
+  background-color: #2597f1;
+}
+
+.event-label {
+  position: relative;
+}
+
+.event-label {
+  display: inline-block;
+  font-size: 75%;
+  padding-right: 10px;
+  text-transform: uppercase;
+}
+
+.vbus-dot {
+  width: 8px;
+  height: 8px;
+  border: 4px solid #143e43;
+  border-radius: 50%;
+}
+
+.vbus-thick-line {
+  border-top-width: 5px;
+}
+
+.vbus-dot, .vbus-thin-line, .vbus-thick-line {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.vbus-thin-line, .vbus-thick-line {
+  border-top-style: solid;
+  position: relative;
+  left: -3px;
+  width: 16px;
+  color: #5aba57;
+}
+
+.vbus-label {
+  display: inline-block;
+  padding-right: 10px;
+}
+
+.vbus-dot--hollow {
+  border-width: 2px;
+}
+
+.chat-date-select {
+  position: relative;
+}
+
+.owl-date-time {
+  position: absolute;
+  top: 65px;
+  left: 100px;
+  background-color: #2597F1;
+}
+
+.violation-box {
+  background-color: red;
+  padding: 2px;
+  color: white;
+}
+
+#driverLogsChart {
+  cursor: zoom-in;
+}
+
+.chart-img {
+  cursor: zoom-out;
+  width: 100%;
+}
+
+.close-btn {
+  padding: 10px;
+}
+
+.panel-heading-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

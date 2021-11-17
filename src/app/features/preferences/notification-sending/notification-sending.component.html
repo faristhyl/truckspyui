@@ -1,0 +1,19 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="pull-left">Sent Notifications</div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="panel-body no-padding override-child-dataTable-margin">
+        <sa-datatable [options]="notificationSendingOption" #notificationSendingTable
+                      tableClass="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th class="col-sm-2">Datetime</th>
+                    <th class="col-sm-2">Type</th>
+                    <th class="col-sm-6">Subject</th>
+                    <th class="col-sm-2">Sending Method</th>
+                </tr>
+            </thead>
+        </sa-datatable>
+    </div>
+</div>

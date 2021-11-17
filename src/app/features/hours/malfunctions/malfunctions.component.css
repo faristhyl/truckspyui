@@ -1,0 +1,26 @@
+.panel-body {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.filter-field {
+    margin-top: 10px;
+}
+
+.pr-0 {
+    padding-right: 0;
+}
+
+.pl-0 {
+    padding-left: 0;
+}
+
+.vehicle-select ::ng-deep .ng-select-container {
+    min-height: 32px;
+}
+
+.panel-heading-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

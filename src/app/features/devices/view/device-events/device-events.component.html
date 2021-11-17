@@ -1,0 +1,16 @@
+<div class="panel panel-default">
+    <div class="panel-heading">Events</div>
+    <div class="panel-body no-padding override-child-dataTable-margin" *ngIf="tableColumns.length > 0">
+        <sa-datatable [options]="optionsEvents" [dataTableColumns]="tableColumns" [dataTableId]="tableName" (selectedColumnsToSave)="saveSelectedColumns($event)"
+            tableClass="table table-striped table-bordered table-hover" #eventsTable>
+            <thead>
+                <tr>
+                    <th class="col-sm-3">Datetime</th>
+                    <th class="col-sm-2">Event Type</th>
+                    <th class="col-sm-3">Location</th>
+                    <th class="col-sm-4">Context</th>
+                </tr>
+            </thead>
+        </sa-datatable>
+    </div>
+</div>

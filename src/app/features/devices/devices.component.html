@@ -1,0 +1,121 @@
+<div id="content">
+  <div class="row">
+    <sa-big-breadcrumbs [items]="['Devices']" icon="tablet" class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+    </sa-big-breadcrumbs>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Devices
+          <a (click)="downloadExcelReport()" class="pull-right">
+            <i class="fa fa-file-excel-o"></i> Devices Report
+          </a>
+        </div>
+        <div class="panel-body no-padding override-child-dataTable-margin" *ngIf="tableColumns.length > 0">
+          <sa-datatable [options]="options" [dataTableColumns]="tableColumns" (selectedColumnsToSave)="saveSelectedColumns($event)" tableClass="table table-striped table-bordered table-hover" #devicesTable>
+            <thead>
+              <tr>
+                <th class="col-1_7">Device ID</th>
+                <th class="col-1">Serial Number</th>
+                <th class="col-sm-1">Status</th>
+                <th class="col-1_6">Device Type</th>
+                <th class="col-1_6">Op Status</th>
+                <th class="col-sm-1">IMEI</th>
+                <th class="col-sm-2">Reporting Profile</th>
+                <th class="col-sm-1">Last Vehicle</th>
+                <th class="col-sm-1">Software Version</th>
+                <th class="col-sm-1">Last Communication</th>
+              </tr>
+            </thead>
+            <thead class="filter-header">
+            <tr>
+              <td class="filter-valuable">
+                <div class="btn-group" style="width: 100%;">
+                  <input class="form-control" style="width: 100%;" placeholder="Device ID Search..." name="iccid"
+                         [disabled]="!devices" id="iccid" [(ngModel)]="filters.iccid" (ngModelChange)="doFilter()"
+                         type="text">
+                  <span class="fa fa-times message-search-clear" (click)="clearIccid()"></span>
+                </div>
+              </td>
+              <td class="filter-valuable">
+                <div class="btn-group" style="width: 100%;">
+                  <input class="form-control" style="width: 100%;" placeholder="Serial Search..." name="serialNumber"
+                         [disabled]="!devices" id="serialNumber" [(ngModel)]="filters.serialNumber" (ngModelChange)="doFilter()"
+                         type="text">
+                  <span class="fa fa-times message-search-clear" (click)="clearSerialNumber()"></span>
+                </div>
+              </td>
+              <td class="filter-valuable">
+                <select style="width: 100%" data-select-search="true" select2 name="status"
+                        [(ngModel)]="filters.status" (changedAction)="onStatusChanged($event)"
+                        [chooseOnTab]="true" [disabled]="!statuses">
+                  <option style="color: lightgray" value="">
+                    All Statuses
+                  </option>
+                  <option *ngFor="let s of statuses" [value]="s">
+                    {{ s | replaceUnderscore }}
+                  </option>
+                </select>
+              </td>
+              <td class="filter-valuable">
+                <select style="width: 100%" data-select-search="true" select2 name="deviceType"
+                        [(ngModel)]="filters.deviceType" (changedAction)="onDeviceTypeChanged($event)"
+                        [chooseOnTab]="true" [disabled]="!deviceTypes">
+                  <option style="color: lightgray" value="">
+                    All Devices
+                  </option>
+                  <option *ngFor="let c of deviceTypes" [value]="c">
+                    {{ c | replaceUnderscore }}
+                  </option>
+                </select>
+              </td>
+              <td class="filter-valuable">
+                <select style="width: 100%" data-select-search="true" select2 name="operationalStatus"
+                        [(ngModel)]="filters.operationalStatus" (changedAction)="onOperationalStatusChanged($event)"
+                        [chooseOnTab]="true" [disabled]="!operationalStatuses">
+                  <option style="color: lightgray" value="">
+                    All Statuses
+                  </option>
+                  <option *ngFor="let s of operationalStatuses" [value]="s">
+                    {{ s | replaceUnderscore }}
+                  </option>
+                </select>
+              </td>
+              <td class="filter-valuable">
+                <div class="btn-group" style="width: 100%;">
+                  <input class="form-control" style="width: 100%;" placeholder="IMEI Search..." name="imei" id="imei"
+                         [disabled]="!devices" [(ngModel)]="filters.imei" (ngModelChange)="doFilter()" type="text">
+                  <span class="fa fa-times message-search-clear" (click)="clearImei()"></span>
+                </div>
+              </td>
+              <td></td>
+              <td class="filter-valuable">
+                <select style="width: 100%" data-select-search="true" select2 name="vehicle"
+                        [(ngModel)]="filters.selectedVehicle" (changedAction)="onVehicleChanged($event)"
+                        [chooseOnTab]="true" [disabled]="!vehicles">
+                  <option style="color: lightgray" value="">
+                    All Vehicles
+                  </option>
+                  <option *ngFor="let v of vehicles" [value]="v.id">
+                    {{ v.remoteId }}
+                  </option>
+                </select>
+              </td>
+              <td class="filter-valuable">
+                <div class="btn-group" style="width: 100%;">
+                  <input class="form-control" style="width: 100%;" placeholder="Version..."
+                         name="softwareVersion" [disabled]="!devices" id="softwareVersion"
+                         [(ngModel)]="filters.softwareVersion" (ngModelChange)="doFilter()" type="text">
+                  <span class="fa fa-times message-search-clear" (click)="clearSoftwareVersion()"></span>
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            </thead>
+          </sa-datatable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

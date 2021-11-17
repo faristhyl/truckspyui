@@ -1,0 +1,92 @@
+<div id="content">
+  <div class="row">
+    <sa-big-breadcrumbs [items]="['Drivers', driver.name()]" icon="user"
+                        class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+    </sa-big-breadcrumbs>
+  </div>
+
+  <div class="row" *ngIf="isLoaded">
+    <div class="col-sm-2 col-md-2 col-lg-2" style="min-height: 100vh; width: calc(176px + 1px); display: inline-block; vertical-align: top;">
+      <ul class="inbox-menu-lg menu-lg-darkmode">
+        <li [class.active]="childPath == 'view'">
+          <a [routerLink]="['view']">General Info</a>
+        </li>
+        <li *ngIf="driver.featuresEnabled?.hoursOfService" [class.active]="childPath == 'logs'">
+          <a [routerLink]="['logs']">Hours Of Service</a>
+        </li>
+        <li *ngIf="driver.featuresEnabled?.devicesEnabled" [class.active]="childPath == 'safety-alerts'">
+          <a [routerLink]="['safety-alerts']">Safety Alerts</a>
+        </li>
+        <li [class.active]="childPath == 'vehicle-utilization'">
+          <a [routerLink]="['vehicle-utilization']">Vehicle Utilization</a>
+        </li>
+        <li *ngIf="driver.featuresEnabled?.devicesEnabled" [class.active]="childPath == 'events'">
+          <a [routerLink]="['events']">Events</a>
+        </li>
+      </ul>
+
+      <div class="form-horizontal" style="margin-left: 5px;">
+        <div class="form-group form-group-closer">
+            <label class="col-sm-5">Current Vehicle</label>
+            <div class="col-sm-7">
+              <a *ngIf="!!driver.vehicle?.id" href="#/vehicles/{{driver.vehicle.id}}/view">
+                {{driver.vehicle.remoteId || '(unspecified)'}}
+              </a>
+              <ng-container *ngIf="!driver.vehicle?.id">
+                N/A
+              </ng-container>
+              <br/>
+              <a class="action-link" (click)="assignVehicle(assignVehicleModal)" *ngIf="vehiclesLoaded && vehicles && vehicles.length > 0">
+                Assign
+              </a>
+              <i *ngIf="vehiclesLoaded && !(vehicles && vehicles.length > 0)">
+                  No vehicles
+              </i>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-10 col-md-10 col-lg-10" style="width: calc(100% - 177px); display: inline-block;">
+      <router-outlet #o="outlet"></router-outlet>
+    </div>
+  </div>
+</div>
+
+<ng-template #assignVehicleModal>
+  <div class="modal-header">
+      <button type="button" class="close" (click)="closeAssignVehicleModal()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+      </button>
+      <h4 class="modal-title">Assign Driver To Vehicle</h4>
+  </div>
+  <div class="modal-body">
+      <form class="form-horizontal" (ngSubmit)="doAssignVehicle()">
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="badge bg-color-gray">
+                <i class="fa-fw fa fa-info"></i>
+              </span>
+              Assigning a driver to a vehicle will associate all of the driving activity of the
+              selected vehicle with this driver until this driver is assigned to another vehicle
+              OR the vehicle is assigned to another driver. <u>Tablet login/logout events will
+              override this assignment.</u>
+            </div>
+          </div>
+          <div class="form-group">
+              <label class="col-sm-3" for="vehicle" style="padding-top: 7px;">Vehicle</label>
+              <div class="col-sm-9">
+                <select style="width: 100%;" data-select-search="true" select2 name="vehicle"
+                  [(ngModel)]="assignVehicleData.vehicleId" (changedAction)="vehicleChanged($event)" [chooseOnTab]="true">
+                  <option *ngFor="let vehicle of vehicles" [value]="vehicle.id">
+                      {{vehicle.remoteId || "(unspecified)"}}
+                  </option>
+              </select>
+            </div>
+          </div>
+          <div class="text-right">
+              <button class="btn btn-primary" type="submit">Assign</button>
+          </div>
+      </form>
+  </div>
+</ng-template>

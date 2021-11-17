@@ -1,0 +1,16 @@
+.page-input {
+    margin: 0 5px 0 5px;
+}
+
+::ng-deep .cdk-overlay-container {
+    position: fixed;
+    z-index: 1090;
+}
+
+::ng-deep body.map-target-cursor mgl-map canvas {
+    cursor: crosshair;
+}
+
+.mapbox-position-results-panel.not-scroll {
+    overflow-y: hidden;
+}

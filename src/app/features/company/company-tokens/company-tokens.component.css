@@ -1,0 +1,3 @@
+:host ::ng-deep .client-id-col {
+    word-break: break-all;
+}

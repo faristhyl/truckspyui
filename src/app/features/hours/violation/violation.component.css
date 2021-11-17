@@ -1,0 +1,27 @@
+.pr-13 {
+  padding-right: 13px;
+}
+
+.pl-13 {
+  padding-left: 13px;
+}
+
+.violation-box {
+  background-color: red;
+  padding: 2px;
+  color: white;
+}
+
+.panel-body {
+  padding: 15px 0;
+}
+
+.filter-field {
+  margin-top: 10px;
+}
+
+.panel-heading-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

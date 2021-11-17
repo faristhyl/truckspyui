@@ -1,0 +1,105 @@
+.row-equal {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+}
+
+.fuel-stations-list {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 13px;
+    padding-bottom: 0px;
+    height: 80vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.fuel-stations-list__title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.fuel-stations-list .list-group {
+    margin-top: 20px;
+    margin-bottom: 0px!important;
+    height: inherit;
+}
+
+.fuel-stations-list__item {
+    position: relative;
+    border: 0;
+    padding-bottom: 12px;
+}
+
+.fuel-stations-list__item.active {
+    background-color: #ddd;
+    color: #000;
+}
+.list-group-item.active .list-group-item-text {
+    color: #000;
+}
+.list-group-item.active .list-group-item-heading {
+    color: #000;
+}
+
+.fuel-stations-list__item .list-group-item-heading {
+    font-size: 12px;
+}
+
+.fuel-stations-list__item .list-group-item-text {
+    font-size: 12px;
+}
+
+.fuel-stations-list__item-amenities {
+    margin-top: 10px;
+    font-size: 10px;
+}
+
+.fuel-stations-list__item-prices {
+    position: absolute;
+    right: 10px;
+    top: 15px;
+    text-align: right;
+}
+
+.fuel-stations-list__item-prices_popup {
+    right: 15px;
+    top: 5px;
+}
+
+.fuel-stations-list__item-prices .list-group-item-text:first-child {
+    color: #5cb85c;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.fuel-stations-list__item .item-bottom-line {
+    display: inline-block;
+    background-color: #ddd;
+    height: 2px;
+    width: 90%;
+    text-align: center;
+    position: absolute;
+    bottom: 2px;
+    left: 5%;
+}
+
+.search-border {
+    border: 1px solid #ddd;
+}
+
+.radius-select {
+    width: 105px;
+    margin-left: 7px;
+    height: 22px;
+}
+
+/* map popup styles */
+:host ::ng-deep .mapboxgl-popup {
+    min-width: 280px;
+    max-width: 400px;
+}
+
+:host ::ng-deep .mapboxgl-popup-content {
+    width: 100%;
+}

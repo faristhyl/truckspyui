@@ -1,0 +1,100 @@
+<ng-container *ngIf="loaded">
+    <ng-container *ngIf="!(dispatchRoute || !isNext)">
+        <i class="fa-fw fa fa-warning"></i>&nbsp;
+        <i>Routing Unavailable</i>
+    </ng-container>
+
+    <ng-container *ngIf="dispatchRoute || !isNext">
+        <mgl-map [style]="style" [fitBoundsOptions]="fitBoundsOptions" (load)="onLoad($event)" [fitBounds]="fitBounds"
+            style="height: 300px!important;">
+            <mgl-control>
+                <button class="btn btn-xs btn-default" (click)="toggleStyle()">
+                    <i class="fa" [ngClass]="{ 'fa-camera': isDefault, 'fa-road': !isDefault }"></i>
+                    {{isDefault ? "Satellite" : "Streets"}}
+                </button>
+            </mgl-control>
+
+            <mgl-control [position]="'top-left'" *ngIf="stop.plannedMiles || stop.plannedTravelDuration">
+                <div style="width: 60px; font-size: 10px; line-height: 13px;">
+                    <b>Planned</b><br/>
+                    <span>{{stop.plannedMiles ? stop.plannedMiles + " miles" : "N/A"}}</span><br/>
+                    <span>{{stop.plannedTravelDuration | seconds2HMM}}</span><br/>
+                </div>
+            </mgl-control>
+
+            <ng-container *ngIf="isNext && dispatchRoute">
+                <mgl-control [position]="'top-left'" *ngIf="dispatchRoute.miles || dispatchRoute.duration">
+                    <div style="width: 80px; font-size: 10px; line-height: 13px;">
+                        <b>Until Destination</b><br/>
+                        <span>{{dispatchRoute.miles ? dispatchRoute.miles + " miles" : "N/A"}}</span><br/>
+                        <span>{{dispatchRoute.duration | seconds2HMM}}</span><br/>
+                    </div>
+                </mgl-control>
+            </ng-container>
+
+            <mgl-image id="pin-image" url="https://api.tiles.mapbox.com/v3/marker/pin-s+FE2020.png" (loaded)="imageLoaded = true">
+            </mgl-image>
+
+            <mgl-layer *ngIf="imageLoaded" id="location-layer-point" type="symbol" source="location-source-point" [layout]="{
+                    'icon-image': 'pin-image',
+                    'icon-size': 1,
+                    'icon-allow-overlap': true
+                }">
+            </mgl-layer>
+
+            <mgl-geojson-source id="location-source-point">
+                <mgl-feature *ngIf="stop.location.isPoint()" [properties]="stop.location.prepareProperties()" [geometry]="stop.location.preparePointGeometry()">
+                </mgl-feature>
+                <mgl-feature *ngIf="stop.location.isPolygon()" [properties]="stop.location.prepareProperties()" [geometry]="stop.location.preparePolygonPointGeometry()">
+                </mgl-feature>
+            </mgl-geojson-source>
+
+            <mgl-geojson-source id="location-source-polygon">
+                <mgl-feature *ngIf="stop.location.isPolygon()" [properties]="stop.location.prepareProperties()" [geometry]="stop.location.prepareGeometry()">
+                </mgl-feature>
+            </mgl-geojson-source>
+
+            <mgl-layer id="location-layer-polygon" type="fill" source="location-source-polygon" [paint]="{
+                    'fill-color': 'rgba(200, 100, 240, 0.4)',
+                    'fill-outline-color': 'rgba(200, 100, 240, 1)'
+                }">
+            </mgl-layer>
+
+            <ng-container *ngIf="isNext">
+                <mgl-geojson-source id="positions-actual-route-source">
+                    <mgl-feature *ngFor="let f of actualLayer"
+                        [properties]="f.properties" [geometry]="f.geometry"></mgl-feature>
+                </mgl-geojson-source>
+                <mgl-layer id="positions-actual-route-layer" type="line" source="positions-actual-route-source"
+                    [paint]="{
+                        'line-color': 'green',
+                        'line-opacity': 0.75,
+                        'line-width': 2
+                      }">
+                </mgl-layer>
+                <ng-container *ngIf="!!actualLayer && actualLayer.length > 0">
+                    <mgl-marker [lngLat]="actualLayer[actualLayer.length - 1].geometry.coordinates[1]">
+                        <i class="fa fa-truck" style="color: red; font-size: 1.5em;"></i>
+                    </mgl-marker>
+                </ng-container>
+            </ng-container>
+
+            <mgl-geojson-source id="positions-planned-route-source">
+                <mgl-feature *ngFor="let f of plannedLayer" 
+                    [properties]="f.properties" [geometry]="f.geometry"></mgl-feature>
+            </mgl-geojson-source>
+            <mgl-layer id="positions-planned-route-layer" type="line" source="positions-planned-route-source"
+                [paint]="{
+                    'line-color': 'blue',
+                    'line-opacity': 0.75,
+                    'line-width': 2
+                  }">
+            </mgl-layer>
+
+        </mgl-map>
+    </ng-container>
+</ng-container>
+
+<ng-container *ngIf="!loaded">
+    <i class="fa fa-refresh fa-spin"></i> Loading...
+</ng-container>

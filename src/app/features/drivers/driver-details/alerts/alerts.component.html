@@ -1,0 +1,110 @@
+<div class="row">
+    <div class="col-sm-12 col-md-offset-6 col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Latest Week
+                <ng-container *ngIf="histogram?.displayableReport?.reportPeriod?.startedAt">
+                    ({{histogram?.displayableReport?.reportPeriod?.startedAt | timezoneHandler | date : 'MM/dd/yyyy'}}&nbsp;-&nbsp;{{histogram?.displayableReport?.reportPeriod?.endedAt | timezoneHandler | date : 'MM/dd/yyyy'}})
+                </ng-container>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <span for="score">Score:</span><br/>
+                        <b name="email">{{histogram?.displayableReport?.score | naHandler}}</b>
+                    </div>
+                    <div class="col-sm-3">
+                        <span for="score">{{
+                            !histogram?.displayableReport?.drivingMinutes && !!histogram?.displayableReport?.drivingMiles ? "Miles" : "Minutes"
+                        }}:</span><br/>
+                        <b name="email">{{histogram?.displayableReport?.drivingMinutes || histogram?.displayableReport?.drivingMiles | naHandler}}</b>
+                    </div>
+                    <div class="col-sm-3">
+                        <span for="score">Positive:</span><br/>
+                        <b name="email">{{histogram?.displayableReport?.positiveEventCount | naHandler}}</b>
+                    </div>
+                    <div class="col-sm-3">
+                        <span for="score">Negative:</span><br/>
+                        <b name="email">{{histogram?.displayableReport?.negativeEventCount | naHandler}}</b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading" style="padding-left: 10px;">
+                <ul class="nav nav-tabs pull-left" style="margin: -10px;">
+                    <li [class.active]="alerts">
+                        <a (click)="!alerts && showAlerts()">
+                            <span><i class="fa fa-video-camera" style="color: red;"></i>&nbsp;Alerts</span>
+                        </a>
+                    </li>
+                    <li [class.active]="!alerts" *ngIf="histogramLoaded">
+                        <a (click)="alerts && showHistogram()">
+                            <span><i class="fa fa-bell"></i>&nbsp;Histogram</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="clearfix"></div>
+            </div>
+
+            <div class="panel-body no-padding override-child-dataTable-margin" *ngIf="alerts && tableColumns.length > 0">
+                <ng-container *ngIf="theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.driverCoaching">
+                    <sa-datatable [options]="options" [dataTableColumns]="tableColumns"
+                        (selectedColumnsToSave)="saveSelectedColumns($event)"
+                        tableClass="table table-striped table-bordered table-hover" #alertsTable>
+                        <thead>
+                            <tr>
+                                <th class="col-1_4">Event ID</th>
+                                <th class="col-1_4">DateTime</th>
+                                <th class="col-1_4">Type</th>
+                                <th class="col-0_7">Vehicle</th>
+                                <th class="col-1_5">Place</th>
+                                <th class="col-1_5">Reviewed</th>
+                                <th class="col-sm-2">Coachable</th>
+                                <th class="col-0_7">Coaching&nbsp;Sent To Driver</th>
+                                <th class="col-1_4">Coaching Completed&nbsp;At</th>
+                            </tr>
+                        </thead>
+                    </sa-datatable>
+                </ng-container>
+
+                <ng-container *ngIf="!(theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.driverCoaching)">
+                    <sa-datatable [options]="optionsShort" [dataTableColumns]="tableColumnsShort"
+                        (selectedColumnsToSave)="saveSelectedColumns($event)"
+                        tableClass="table table-striped table-bordered table-hover" #alertsTable>
+                        <thead>
+                            <tr>
+                                <th class="col-1_4">Event ID</th>
+                                <th class="col-1_4">DateTime</th>
+                                <th class="col-1_4">Type</th>
+                                <th class="col-0_7">Vehicle</th>
+                                <th class="col-1_5">Place</th>
+                                <th class="col-1_5">Reviewed</th>
+                                <th class="col-sm-2">Coachable</th>
+                            </tr>
+                        </thead>
+                    </sa-datatable>
+                </ng-container>
+            </div>
+
+            <div class="panel-body no-padding override-child-dataTable-margin override-no-pagination-dataTable" *ngIf="!alerts">
+                <sa-datatable [options]="optionsHistogram" tableClass="table table-striped table-bordered table-hover"
+                    [dataTableId]="'histogramTable'">
+                    <thead>
+                        <tr>
+                            <th class="col-sm-4">Event Type</th>
+                            <th class="col-sm-2" id="header-column-1" style="text-align: center;"></th>
+                            <th class="col-sm-2" id="header-column-2" style="text-align: center;"></th>
+                            <th class="col-sm-2" id="header-column-3" style="text-align: center;"></th>
+                            <th class="col-sm-2" id="header-column-4" style="text-align: center;"></th>
+                        </tr>
+                    </thead>
+                </sa-datatable>
+            </div>
+        </div>
+    </div>
+</div>

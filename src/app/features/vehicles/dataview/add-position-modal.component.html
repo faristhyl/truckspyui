@@ -1,0 +1,103 @@
+<ng-template #searchTemplate let-r="result" let-t="term">
+    <div style="text-align: left" *ngIf="r.isLocation">
+        <i class="fa fa-map-marker"></i>&nbsp;
+        <ngb-highlight [result]="r.entry.name" [term]="t"></ngb-highlight>
+    </div>
+    <div style="text-align: left" *ngIf="!r.isLocation">
+        <ngb-highlight [result]="r.entry.place_name" [term]="t"></ngb-highlight>
+    </div>
+</ng-template>
+
+<div class="modal-header">
+    <button type="button" class="close" (click)="closeModal()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title">Add Positions</h4>
+</div>
+<div class="modal-body">
+    <form class="form-horizontal" #addPositionForm="ngForm" (ngSubmit)="addPositionForm.form.valid && createPositions()">
+        <div class="form-horizontal tables-flat">
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th class="col-sm-3">Origin</th>
+                    <th class="col-sm-3">Dest</th>
+                    <th class="col-sm-3">Depart</th>
+                    <th class="col-sm-3">Arrive</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let position of positionsData; index as order">
+                    <td class="col-12">
+                        <div class="location-field">
+                            <input class="location-field-input" type="text" placeholder="Location {{order * 2 + 1}}" [resultTemplate]="searchTemplate" [ngbTypeahead]="searchPlaces(searchInputFrom, order, 'from')"
+                                (selectItem)="clickSelected($event, order, 'from')" #searchInputFrom="ngbTypeahead" (click)="position.clickFrom$.next($event.target.value)"
+                                 (focusout)="focusOut(order, 'from')" [(ngModel)]="position.theNameFrom" name="locationFrom{{position.id}}-{{order * 2 + 1}}" id="locationFrom{{position.id}}-{{order * 2 + 1}}" style="width: 100%"/>
+                                <div (click)="target(order, 'from')" class="location-field-target">
+                                   <i class="fa fa-bullseye" aria-hidden="true"></i>
+                                </div>
+                        </div>
+                    </td>
+                    <td class="col-12">
+                        <div class="location-field">
+                        <input class="location-field-input" type="text" placeholder="Location {{order * 2 + 2}}" [resultTemplate]="searchTemplate" [ngbTypeahead]="searchPlaces(searchInputTo, order, 'to')"
+                                (selectItem)="clickSelected($event, order, 'to')" #searchInputTo="ngbTypeahead" (click)="position.clickTo$.next($event.target.value)"
+                                 (focusout)="focusOut(order, 'to')" [(ngModel)]="position.theNameTo" name="locationTo{{position.id}}-{{order * 2 + 2}}" id="locationTo{{position.id}}-{{order * 2 + 2}}" style="width: 100%"/>
+                                <div (click)="target(order, 'to')" class="location-field-target">
+                                    <i class="fa fa-bullseye" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                    </td>
+                    <td class="col-12">
+                        <date-time-widget
+                            #datetimeInputFrom="ngModel"
+                            name="datetime{{position.id}}-{{order * 2 + 1}}" required
+                            [(ngModel)]="position.datetimeFrom"
+                            (dateTimeChange)="this.calculateConditions(); "
+                            placeholder="L{{order * 2 + 1}} Datetime"
+                            [ngClass]="{ 'has-error': addPositionForm.submitted && datetimeInputFrom.invalid }">
+                        </date-time-widget>
+                        <div *ngIf="addPositionForm.submitted && datetimeInputFrom.invalid" class="help-block">
+                            <div class="small" *ngIf="datetimeInputFrom.errors">Please enter datetime
+                            </div>
+                        </div>
+                    </td>
+                    <td class="col-12">
+                        <date-time-widget
+                            #datetimeInputTo="ngModel"
+                            name="datetime{{position.id}}-{{order * 2 + 2}}" required
+                            [(ngModel)]="position.datetimeTo"
+                            (dateTimeChange)="this.calculateConditions(); "
+                            placeholder="L{{order * 2 + 2}} Datetime"
+                            [ngClass]="{ 'has-error': addPositionForm.submitted && datetimeInputTo.invalid }">
+                        </date-time-widget>
+                        <div *ngIf="addPositionForm.submitted && datetimeInputTo.invalid" class="help-block">
+                            <div class="small" *ngIf="datetimeInputTo.errors">Please enter datetime
+                            </div>
+                        </div>
+                    </td>
+                    <td class="">
+                        <button class="btn btn-xs btn-default" type="button" (click)="deletePosition(order)" *ngIf="positionsData.length > 1">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td><td></td><td></td><td></td>
+                    <td>
+                        <button class="btn btn-xs btn-success" type="button" (click)="addPosition()" *ngIf="positionsData.length < 15">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <br/>
+
+        <div class="text-right">
+            <button class="btn btn-primary" type="submit" [disabled]="!allSelected">Add</button>
+        </div>
+    </form>
+</div>

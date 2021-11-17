@@ -1,0 +1,47 @@
+<div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">Safety Alerts</div>
+
+            <div class="panel-body no-padding override-child-dataTable-margin" *ngIf="tableColumns.length > 0">
+                <ng-container *ngIf="theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.driverCoaching">
+                    <sa-datatable [options]="options" [dataTableColumns]="tableColumns"
+                        (selectedColumnsToSave)="saveSelectedColumns($event)"
+                        tableClass="table table-striped table-bordered table-hover" #alertsTable>
+                        <thead>
+                            <tr>
+                                <th class="col-1_4">Event ID</th>
+                                <th class="col-1_4">DateTime</th>
+                                <th class="col-0_7">Type</th>
+                                <th class="col-1_4">Driver</th>
+                                <th class="col-1_5">Place</th>
+                                <th class="col-1_5">Reviewed</th>
+                                <th class="col-sm-2">Coachable</th>
+                                <th class="col-0_7">Coaching&nbsp;Sent To Driver</th>
+                                <th class="col-1_4">Coaching Completed&nbsp;At</th>
+                            </tr>
+                        </thead>
+                    </sa-datatable>
+                </ng-container>
+
+                <ng-container *ngIf="!(theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.driverCoaching)">
+                    <sa-datatable [options]="optionsShort" [dataTableColumns]="tableColumnsShort"
+                        (selectedColumnsToSave)="saveSelectedColumns($event)"
+                        tableClass="table table-striped table-bordered table-hover" #alertsTable>
+                        <thead>
+                            <tr>
+                                <th class="col-1_4">Event ID</th>
+                                <th class="col-1_4">DateTime</th>
+                                <th class="col-0_7">Type</th>
+                                <th class="col-1_4">Driver</th>
+                                <th class="col-1_5">Place</th>
+                                <th class="col-1_5">Reviewed</th>
+                                <th class="col-sm-2">Coachable</th>
+                            </tr>
+                        </thead>
+                    </sa-datatable>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>

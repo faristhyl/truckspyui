@@ -1,0 +1,20 @@
+{
+  "/base_api/*": {
+    "target": "https://staging.truckspyinfra.com",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+        "^/base_api": ""
+    }
+  },
+  "/hos_api/*": {
+    "target": "https://hos.vistracks.com",
+    "secure": true,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/hos_api": ""
+    }
+  }
+}

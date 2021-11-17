@@ -1,0 +1,38 @@
+<div id="content">
+  <div class="row">
+    <sa-big-breadcrumbs [items]="['Hours of Service']" icon="clock-o" class="col-xs-8"> </sa-big-breadcrumbs>
+  </div>
+  <div class="row">
+    <div class="col-sm-2 col-md-2 col-lg-2" style="min-height: 100vh;">
+      <ul class="inbox-menu-lg menu-lg-darkmode">
+        <li [class.active]="childPath == 'drivers'">
+          <a [routerLink]="['drivers']">Drivers</a>
+        </li>
+        <li [class.active]="childPath == 'logs'">
+          <a [routerLink]="['logs']">Logs</a>
+        </li>
+        <li [class.active]="childPath == 'violation'">
+          <a [routerLink]="['violation']">Violation</a>
+        </li>
+        <li [class.active]="childPath == 'unindentified-driving'">
+          <a [routerLink]="['unindentified-driving']">UnIndentified Driving</a>
+        </li>
+        <li [class.active]="childPath == 'reports'">
+          <a [routerLink]="['reports']">Reports</a>
+        </li>
+        <li [class.active]="childPath == 'malfunctions'">
+          <a [routerLink]="['malfunctions']">Malfunctions</a>
+        </li>
+        <li [class.active]="childPath == 'log-edits'">
+          <a [routerLink]="['log-edits']">Log Edits</a>
+        </li>
+        <li [class.active]="childPath == 'fmcsa-data-transfer'">
+          <a [routerLink]="['fmcsa-data-transfer']">FMCSA Data Transfer</a>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-10 col-md-10 col-lg-10">
+      <router-outlet #o="outlet"></router-outlet>
+    </div>
+  </div>
+</div>

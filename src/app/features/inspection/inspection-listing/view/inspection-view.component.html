@@ -1,0 +1,205 @@
+<div id="content">
+  <div class="row">
+    <sa-big-breadcrumbs [items]="['Inspection','Vehicle Inspections', inspection?.getNum()]" icon="check-square-o"
+      class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+    </sa-big-breadcrumbs>
+
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 text-right breadcrumbs-area">
+      <a *ngIf="inspection?.id" class="breadcrumbs-link" (click)="onDownloadPDF()">
+        <i class="fa fa-file-pdf-o"></i>&nbsp;Download&nbsp;(PDF)
+      </a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">Details</div>
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-5">Vehicle</label>
+              <label class="col-sm-7">
+                <a *ngIf="!!inspection?.vehicle?.id"
+                  href="#/vehicles/{{inspection.vehicle.id}}/view">{{inspection.vehicle.remoteId || '(unspecified)'}}</a>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-5">Driver</label>
+              <label class="col-sm-7">
+                <a *ngIf="!!inspection?.driver?.id" href="#/drivers/{{inspection.driver.id}}/view">
+                  {{inspection.driver.name() + ' (' + (inspection.driver.remoteId || '(unspecified)') + ')'}}
+                </a>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-5">Created At</label>
+              <label class="col-sm-7">
+                {{inspection?.createdAt | timezoneHandler | date : 'yyyy-MM-dd, HH:mm:ss'}}
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-5">Location</label>
+              <label class="col-sm-7">{{inspection?.place}}</label>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-5">Type</label>
+              <label class="col-sm-7">{{inspection?.type}}</label>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-5">Trailers</label>
+              <label class="col-sm-7">{{inspection?.trailers}}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-12 col-md-12 col-lg-8">
+      <app-inspections-for *ngIf="!!inspection?.vehicle?.id" [theVehicle]="inspection?.vehicle"></app-inspections-for>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="inspection">
+    <div class="col-sm-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">Questions</div>
+
+        <div class="panel-body">
+          <div class="form-horizontal" *ngIf="inspection?.answers.length > 0">
+            <div *ngFor="let answer of inspection?.answers; let i=index;">
+              <div class="form-group">
+                <div class="col-sm-6">{{answer?.question?.text}}</div>
+                <div class="col-sm-6">
+                  <div class="pull-right">
+                    {{answer.yesNo()}}
+                    <button class="btn btn-xs btn-default" *ngIf="answer.answer" [disabled]="showActionStarted" (click)="showHideAnswer(answer, i)">
+                      <i class="fa" [class.fa-angle-down]="!answer.show" [class.fa-angle-up]="answer.show"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group" *ngIf="answer.answer && answer.show">
+                <div class="col-sm-4">
+                  <p>Driver's comment about the issue: {{answer?.description}} </p>
+                </div>
+
+                <div class="col-sm-4">
+                  <div class="image-section" *ngIf="!answerImageLoading && answerImage && answerImage !== 'error'"
+                       (click)="showAnswerImageModal()">
+                    <img [src]="answerImage" />
+                  </div>
+
+                  <div class="image-section" *ngIf="!answerImageLoading && answerImage && answerImage === 'error'">
+                    <span> The answer does not have an uploaded image</span>
+                  </div>
+                </div>
+
+                <div class="col-sm-4">
+                  <div class="form-horizontal" *ngIf="!answer?.issue?.id">
+                    <div class="form-group">
+                      <h4 class="col-sm-12">Linked Issue</h4>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-12">The answer doesn't have linked issue</label>
+                    </div>
+                  </div>
+
+                  <div class="form-horizontal" *ngIf="!!answer?.issue?.id">
+                    <div class="form-group">
+                      <h4 class="col-sm-12">Linked Issue</h4>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="col-sm-5">Issue Num</label>
+                      <label class="col-sm-7">
+                        <a href="#/maintenance/issues/{{answer.issue.id}}/view">
+                          {{answer.issue.number}}
+                        </a>
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-5">Status</label>
+                      <label class="col-sm-7">{{answer.issue?.status}}</label>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-5">WO Num</label>
+                      <label class="col-sm-7">
+                        <ng-container *ngIf="answer.issue?.repairOrder?.id">
+                          <a href="#/maintenance/workorders/{{answer.issue.repairOrder.id}}/view">
+                            {{answer.issue.repairOrder.getNumber()}}
+                          </a>
+                        </ng-container>
+                        <ng-container *ngIf="!answer.issue?.repairOrder?.id">
+                          N/A
+                        </ng-container>
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-5">WO Created At</label>
+                      <label class="col-sm-7">
+                        {{answer.issue?.repairOrder?.createdAt | timezoneHandler | date : 'yyyy-MM-dd, HH:mm:ss' | naHandler}}
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-5">Driver Approved At</label>
+                      <label class="col-sm-7">
+                        {{answer.issue.approvedAt | timezoneHandler | date : 'yyyy-MM-dd, HH:mm:ss' | naHandler}}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-horizontal" *ngIf="inspection?.answers.length === 0">
+            <div class="form-group">
+              <div class="col-sm-12">
+                No questions available
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row" *ngIf="inspection?.driver?.id">
+    <div class="col-sm-12 col-md-6 col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">Approved by Driver ({{inspection?.driver?.name()}})</div>
+        <div class="panel-body">
+          <div *ngIf="!driverSignatureLoading && driverSignature && driverSignature !== 'error'">
+            <img style="width: 100%;" [src]="driverSignature" />
+          </div>
+
+          <div *ngIf="!driverSignatureLoading && driverSignature && driverSignature === 'error'">
+            The signature does not have an uploaded image
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div bsModal #answerImageModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="closeAnswerImageModal()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Answer Image</h4>
+      </div>
+      <div class="modal-body no-padding">
+        <img [src]="answerImage" style="width: 100%;" />
+      </div>
+    </div>
+  </div>
+</div>

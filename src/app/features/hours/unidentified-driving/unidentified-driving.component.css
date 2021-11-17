@@ -1,0 +1,18 @@
+.panel-body {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.vehicle-select ::ng-deep .ng-select-container {
+    min-height: 32px;
+}
+
+::ng-deep td {
+    word-break: break-all;
+}
+
+.panel-heading-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

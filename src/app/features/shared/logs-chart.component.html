@@ -1,0 +1,418 @@
+<div id="content" class="panel panel-default" *ngIf="!isShowOnlyChart">
+  <div class="panel-heading panel-heading-flex"> 
+    <b>Logs</b>
+    <button class="btn btn-primary" (click)="downloadExcel()">Download Excel</button>
+  </div>
+  <div class="panel-body">
+    <div class="pull-left">Driver History</div>
+    <div class="pull-right">
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="panel-body">
+    <div class="col-sm-3">
+      <select style="width: 100%;" class="form-control" name="driverName" id="driverName" [(ngModel)]="driverId"
+              (ngModelChange)="driverChanged($event)" [disabled]="!drivers.length">
+        <option  *ngFor="let d of drivers" [value]="d.id">{{ d.name() }}</option>
+      </select>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <div>
+      <div class="row">
+        <!-- Driver Information -->
+        <div class="col-sm-12 col-md-12 col-lg-3 panel-group" *ngIf="!isShowOnlyChart">
+          <div class="panel panel-default hos-info-panel">
+            <div class="panel-heading">
+              <div class="pull-left">Driver Information</div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="panel-body">
+              <div class="form-group">
+                <label class="col-sm-12">Driver ID</label>
+                <div class="col-sm-12">
+                  {{selectedDriver && selectedDriver.alias || "&nbsp;"}}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-12">Driver Name</label>
+                <div class="col-sm-12">
+                  {{driverData && driverData.driverFullName || "&nbsp;"}}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-12">Co-Driver(s)</label>
+                <div class="col-sm-12">
+                  {{driverData && driverData.coDriverName || "&nbsp;"}}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-12">Total Mileage</label>
+                <div class="col-sm-12">
+                  {{
+                  driverData && driverData.totalMileageInMi
+                  ? driverData.totalMileageInMi + " Mi"
+                  :"&nbsp;"
+                  }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel panel-default hos-info-panel">
+            <div class="panel-heading">
+              <div class="pull-left">Carrier Information</div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="panel-body">
+              <div class="form-group">
+                <label class="col-sm-12">Carrier Name</label>
+                <div class="col-sm-12">
+                  {{driverData && driverData.carrier || "&nbsp;"}}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-12">Main Office</label>
+                <div class="col-sm-12">
+                  {{driverData && driverData.mainOfficeAddress || "&nbsp;"}}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-12">Home Terminal</label>
+                <div class="col-sm-12">
+                  {{driverData && driverData.homeTerminalAddress || "&nbsp;"}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel panel-default hos-info-panel">
+            <div class="panel-heading">
+              <div class="pull-left">Vehicle Information</div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="panel-body">
+              <div class="form-group">
+                <label class="col-sm-12">Vehicle Driven</label>
+                <div class="col-sm-12">
+                  {{driverData && driverData.vehicle && driverData.vehicle.name || "&nbsp;"}}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-12">Total Mileage</label>
+                <div class="col-sm-12">
+                  {{
+                  driverData && driverData.totalMileageInMi
+                  ? driverData.totalMileageInMi + " Mi"
+                  :"&nbsp;"
+                  }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel panel-default hos-info-panel">
+            <div class="panel-heading">
+              <div class="pull-left">Resources</div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="panel-body">
+              <div class="form-group">
+                <label class="col-sm-12">Trailers Used</label>
+                <div class="col-sm-12">
+                  <ng-container *ngIf="driverData && driverData.trailersAttached">
+                    <div *ngFor="let t of driverData.trailersAttached">
+                      {{t.name}}
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="!driverData || !driverData.trailersAttached">
+                    &nbsp;
+                  </ng-container>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-12">Shipments</label>
+                <div class="col-sm-12">
+                  {{driverData && driverData.shippingDocsManifestNo || "&nbsp;"}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Driver chart -->
+        <div class="col-sm-12 col-md-12 col-lg-9">
+          <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+              <div class="panel panel-default">
+                <div class="panel-body no-padding">
+                  <div *ngIf="chartsDataLoaded">
+                    <div class="panel-body pull-left">
+                      <ul class="pager padding-left-1">
+                        <li><a (click)="onPreviousDate()">&lt;&lt;</a></li>
+                        <li>
+                          <a class="chat-date-select"
+                             (click)="openDatePicker()">{{ selectedDate | date: 'EEEE MMMM d, y'}}</a>
+                          <owl-date-time-inline *ngIf="isSelectedDateOn" class="owl-date-time" [pickerType]="'calendar'"
+                                                [max]="dateMaxDate" (ngModelChange)="onSelectedDateChange($event)"
+                                                [(ngModel)]="dateTimePickerDate">
+                          </owl-date-time-inline>
+                        </li>
+                        <li><a (click)="onNextDate()">&gt;&gt;</a></li>
+                      </ul>
+                    </div>
+                    <div class="panel-body pull-right">
+                      <div class="checkbox padding-x-1">
+                        <label>
+                          <input type="checkbox" name="driverLocalTimeZoneCheckbox" [(ngModel)]="isDateDriverTimeZone"
+                                 (change)="onChangeDateTimeZone()" />Central (CST6CDT)
+                        </label>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="panel-body">
+                      <app-gridchart id="driverLogsChart" [entity]="driverLogs" [selDate]="selectedDate"
+                                     *ngIf="driversLogsLoaded" (click)="onZoomChart('driverLogsChart')"
+                                     data-toggle="modal" data-target="#d3ChartZoomInOutModal"
+                                     [logsChartApi]="logsChartApi"
+                                     >
+                      </app-gridchart>
+
+                      <div style="margin-bottom: 10px;">
+                        <span class="event-label">
+                          <span class="vbus-dot"></span>
+                          <span class="vbus-thick-line"></span>
+                          <span class="vbus-label">VBUS Connection</span>
+                        </span>
+                        <span class="event-label">
+                          <span class="vbus-dot vbus-dot--hollow"></span>
+                          <span class="vbus-thin-line"></span>
+                          <span class="vbus-label">VBUS Disconnection</span>
+                        </span>
+                      </div>
+
+                      <ul class="nav nav-tabs" *ngIf="exceptionsUSA || exceptionsCanada" style="margin-top: 25px!important;">
+                        <li [class.active]="usaSelected" *ngIf="exceptionsUSA">
+                          <a (click)="!usaSelected && showUSA()">
+                            USA
+                          </a>
+                        </li>
+                        <li [class.active]="!usaSelected" *ngIf="exceptionsCanada">
+                          <a (click)="usaSelected && showCanada()">
+                            Canada
+                          </a>
+                        </li>
+                      </ul>
+                      <div *ngIf="!!exceptionsList && exceptionsList.length > 0" style="padding-top: 15px!important;">
+                        <b>Exceptions</b><br/>
+                        <span *ngFor="let e of exceptionsList; index as order">
+                          {{order + 1}}. {{e}}
+                        </span>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="clearfix"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+              <div class="panel panel-default hos-panel">
+                <div class="panel-body no-padding override-child-dataTable-margin" *ngIf="vehicleLocationLoaded">
+                  <sa-datatable [options]="driverHistoryTableOptionsOptions" #driverHistoryTable
+                                tableClass="table table-striped table-bordered table-hover ">
+                    <thead>
+                    <tr>
+                      <th class="col-sm-1">Id</th>
+                      <th class="col-sm-1">Time</th>
+                      <th class="col-sm-1">Status</th>
+                      <th class="col-sm-2">Location</th>
+                      <th class="col-sm-2">Remarks</th>
+                      <th class="col-sm-2">Vehicle</th>
+                      <th class="col-sm-1">Odometer</th>
+                      <th class="col-sm-1">Violation</th>
+                      <th class="col-sm-2">Actions</th>
+                    </tr>
+                    </thead>
+                  </sa-datatable>
+                </div>
+                <div class="panel-footer">
+                  <div>
+                    <span class="hos-log-entry-marker"><i class="fa fa-asterisk"></i></span><span> = Edited Entries</span>
+                    <span class="hos-log-entry-marker" style="padding-left: 15px">M</span><span> = Manual Odometers</span>
+                    <span style="padding-left: 15px"><b>IC</b></span><span> = Inactive Changed</span>
+                    <span style="padding-left: 15px"><b>ICR</b></span><span> = Inactive Change Requested</span>
+                  </div>
+                  <div>
+                    <span><b>ICJ</b></span><span> = Inactive Change Rejected</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template class="modal-dialog" #d3ChartZoomInOutModal>
+  <div class="modal-content modal-lg">
+    <div class="modal-header">
+      <button type="button" class="close" (click)="closeD3ChartZoomInOutModal()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body" *ngIf="chartImg"
+         style="background-size: 100% 100%; width: 95%; height: 50vh; margin: 0px 10px 0 20px;"
+         [ngStyle]="{'background-image':'url('+chartImg+')'}">
+    </div>
+  </div>
+</ng-template>
+
+<!-- update driver history modal -->
+<ng-template class="modal-dialog" #editDriverHistoryModal>
+  <div class="modal-content">
+    <div class="modal-header bg-primary">
+      <button type="button" class="close" (click)="closeEditDriverHistoryModal()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h4 class="modal-title">Update Driver History</h4>
+    </div>
+    <form class="form-horizontal" #editDriverHistoryForm="ngForm"
+          (ngSubmit)="editDriverHistoryForm.form.valid && onUpdateEditDriverHistory(editDriverHistoryForm)">
+      <div class="modal-body">
+        <div class="row margin-top-10">
+          <div class="col-sm-6">
+            <label for="driverHistoryDate">Date</label>
+            <input class="form-control" name="driverHistoryDate" id="driverHistoryDate" [(ngModel)]="driverHistoryUpdateData.date"
+                   [owlDateTime]="driverHistoryDate" [owlDateTimeTrigger]="driverHistoryDate" placeholder="Date"
+                   [max]="dateMaxDate" autocomplete="nope" #dateInput="ngModel" required>
+            <owl-date-time [pickerType]="'calendar'" #driverHistoryDate></owl-date-time>
+            <div *ngIf="editDriverHistoryForm.submitted && dateInput.invalid" class="help-block">
+              <div class="small" *ngIf="dateInput.errors.required">Please select date
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <label for="driverHistoryTime">Time</label>
+            <input class="form-control" name="driverHistoryTime" id="driverHistoryTime" [(ngModel)]="driverHistoryUpdateData.time"
+                   [owlDateTime]="driverHistoryTime" [owlDateTimeTrigger]="driverHistoryTime" placeholder="Time"
+                   autocomplete="nope" #timeInput="ngModel" required>
+            <owl-date-time [pickerType]="'timer'" #driverHistoryTime></owl-date-time>
+            <div *ngIf="editDriverHistoryForm.submitted && timeInput.invalid" class="help-block">
+              <div class="small" *ngIf="timeInput.errors.required">Please select time
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row margin-top-10">
+          <div class="col-sm-6">
+            <div [ngClass]="{ 'has-error': editDriverHistoryForm.submitted && statusSelect.invalid }">
+              <label for="status">Status</label>
+              <select class="form-control" style="width:100%" name="status" id="status"
+                      [(ngModel)]="driverHistoryUpdateData.eventType" #statusSelect="ngModel"
+                      [disabled]="isDriverHistoryUpdateStatusDisabled" required>
+                <option *ngFor="let s of statusArr" [value]="s">{{s}}</option>
+              </select>
+              <div *ngIf="editDriverHistoryForm.submitted && statusSelect.invalid" class="help-block">
+                <div class="small" *ngIf="statusSelect.errors.required">Please select status
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div [ngClass]="{ 'has-error': editDriverHistoryForm.submitted && odometerInput.invalid }">
+              <label for="odometer">Odometer</label>
+              <input class="form-control" id="odometer" name="odometer" type="number" [(ngModel)]="driverHistoryUpdateData.odometerMi"
+                     placeholder="Odometer" #odometerInput="ngModel" required>
+              <div *ngIf="editDriverHistoryForm.submitted && odometerInput.invalid" class="help-block">
+                <div class="small" *ngIf="odometerInput.errors.required">Please enter odometer in miles
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row margin-top-10">
+          <div class="col-sm-6">
+            <div [ngClass]="{ 'has-error': editDriverHistoryForm.submitted && cityInput.invalid }">
+              <label for="City">City</label>
+              <input class="form-control" id="City" name="City" [(ngModel)]="driverHistoryUpdateData.location" placeholder="City"
+                     #cityInput="ngModel" required>
+              <div *ngIf="editDriverHistoryForm.submitted && cityInput.invalid" class="help-block">
+                <div class="small" *ngIf="cityInput.errors.required">Please enter city / location
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div [ngClass]="{ 'has-error': editDriverHistoryForm.submitted && stateSelect.invalid }">
+              <label for="state">State</label>
+              <select class="form-control" style="width:100%" name="state" id="state"
+                      [(ngModel)]="driverHistoryUpdateData.state" #stateSelect="ngModel"
+                      (change)="onUpdateState(editDriverHistoryForm)" required>
+                <option value="" selected>Select State</option>
+                <option *ngFor="let s of states" [value]="s.key">{{s.value}}</option>
+              </select>
+              <div *ngIf="editDriverHistoryForm.submitted && stateSelect.invalid" class="help-block">
+                <div class="small" *ngIf="stateSelect.errors.required">Please select state
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" name="personalConveyance" [(ngModel)]="driverHistoryUpdateData.personalConveyance"
+                   (change)="onPersonalConveyanceChange()" />Personal
+            Conveyance
+          </label>
+          &nbsp; &nbsp;
+          <label>
+            <input type="checkbox" name="yardMoves" [(ngModel)]="driverHistoryUpdateData.yardMoves"
+                   (change)="onYardMovesChange()" />Yard
+            Moves
+          </label>
+        </div>
+        <div class="row margin-top-10">
+          <div class="col-sm-12">
+            <div [ngClass]="{ 'has-error': editDriverHistoryForm.submitted && noteInput.invalid }">
+              <label for="Note">Note</label>
+              <textarea class="form-control" id="Note" name="Note" [(ngModel)]="driverHistoryUpdateData.note" placeholder="Note"
+                        #noteInput="ngModel" rows="4" required></textarea>
+              <div *ngIf="editDriverHistoryForm.submitted && noteInput.invalid" class="help-block">
+                <div class="small" *ngIf="noteInput.errors.required">Please enter note
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row margin-top-10">
+          <div class="col-sm-12">
+            <div [ngClass]="{ 'has-error': editDriverHistoryForm.submitted && reasonSelect.invalid }">
+              <label for="editReason">Reason For Edit</label>
+              <select class="form-control" style="width:100%" name="editReason" id="editReason"
+                      [(ngModel)]="driverHistoryUpdateData.editReason" #reasonSelect="ngModel"
+                      (change)="onUpdateReason(editDriverHistoryForm)">
+                <option value="" selected>Select Reason</option>
+                <option *ngFor="let r of driverHistoryUpdateDataReasonArr" [value]="r">{{r}}</option>
+              </select>
+              <div *ngIf="editDriverHistoryForm.submitted && reasonSelect.invalid" class="help-block">
+                <div class="small" *ngIf="reasonSelect.errors.required">Please select reason
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-right margin-top-10">
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

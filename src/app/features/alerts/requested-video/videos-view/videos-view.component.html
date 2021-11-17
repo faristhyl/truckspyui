@@ -1,0 +1,61 @@
+<div class="modal-header">
+    <h4 class="modal-title pull-left">Videos</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closeAlertViewModal()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body no-padding">
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="panel panel-default no-border">
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <label class="col-sm-12" *ngIf="videos.length === 0">
+                            No videos available for this alert.
+                        </label>
+
+                        <div class="col-sm-12" *ngIf="videos.length > 0">
+                            <div *ngFor="let group of videos; let groupIndex = index;" class="videos-group" [class.mt-30]="groupIndex !== 0">
+                                <ng-container *ngFor="let next of group; let videoIndex = index">
+                                    <!-- Workaround: adressing directly to videos[0] will not refresh after prioritizeVideo() -->
+                                    <video controls #videoPlayer style="width: 100%" *ngIf="videoIndex === 0" autoplay="true"
+                                         onpause="truckspy.onPause()" onplay="truckspy.onPlay()" onseeked="truckspy.onSeeked()">
+                                        <source src="{{next.link}}" type="video/mp4" />
+                                        Browser not supported
+                                    </video>
+                                </ng-container>
+
+                                <div class="form-inline">
+                                    <span *ngFor="let next of group; let videoIndex = index;" class="video-container">
+                                        <video class="alert-small-video-marker" (click)="prioritizeVideo(videoIndex, groupIndex)" style="width: 100%" *ngIf="videoIndex >= 1 && videoIndex <= 3"> <!-- We will show here up to 3 videos -->
+                                            <source src="{{next.link}}" type="video/mp4" />
+                                            Browser not supported
+                                        </video>
+                                        <div *ngIf="groupIndex >= 1 && groupIndex <= 3 && next.link === null" class="no-video-block">
+                                            <div class="no-video-block-wrapper">
+                                                <div class="no-video-icon">
+                                                    <i class="fa fa-play" aria-hidden="true"></i>
+                                                    <i class="fa fa-ban fa-fw" aria-hidden="true"></i>
+                                                </div>
+                                                <span class="no-video-text">Left Camera</span>
+                                            </div>
+                                        </div>
+                                        <div class="video-overlay" *ngIf="videoIndex >= 1 && videoIndex <= 3">
+                                            <p *ngIf="next.position === 0">FRONT CAMERA VIEW</p>
+                                        <p *ngIf="next.position === 1">BACKWARD CAMERA VIEW</p>
+                                            <p *ngIf="next.position === 2">LEFT SIDE VIEW</p>
+                                            <p *ngIf="next.position === 3">RIGHT SIDE VIEW</p>
+                                        </div>
+                                        
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

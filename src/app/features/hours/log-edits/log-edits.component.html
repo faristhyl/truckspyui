@@ -1,0 +1,88 @@
+<div id="content" class="panel panel-default">
+  <div class="panel-heading panel-heading-flex">
+    <b>Log Edits</b>
+    <button class="btn btn-primary" (click)="downloadExcel()">Download Excel</button>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-12 margin-top-10">
+        <select style="width: 100%;" class="form-control" name="dispatchGroup" id="dispatchGroup"
+          [(ngModel)]="filterOption.selectedDispatchGroupId" (ngModelChange)="onDispatchGroupFilterChange()"
+          [disabled]="!dispatchGroups.length">
+          <option value="all" selected>All Dispatch Groups</option>
+          <option *ngFor="let d of dispatchGroups" [value]="d.id">{{d.name}}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 margin-top-10">
+        <select style="width: 100%;" class="form-control" name="driver" id="driverName"
+          [(ngModel)]="filterOption.selectedDriverId" (ngModelChange)="onDriverFilterChange()" [disabled]="!drivers.length">
+          <option *ngIf="filterOption.selectedDriverIds && !filterOption.selectedDriverIds.length && filterOption.selectedDispatchGroupId !== 'all'" 
+            value="all" selected>No Drivers</option>
+          <option value="all" selected>All Drivers</option>
+          <option *ngFor="let d of drivers" [value]="d.id">{{ d.name()}}</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 margin-top-10">
+        <select style="width: 100%;" class="form-control" name="logType" id="logType" [(ngModel)]="filterOption.logType"
+          (ngModelChange)="refreshData()">
+          <option value="all" selected>All Logs</option>
+          <option value="Active">Accepted</option>
+          <option value="InactiveChangeRejected">Rejected</option>
+          <option value="InactiveChangeRequested">Outstanding</option>
+        </select>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 margin-top-10 margin-bottom-10">
+        <select style="width: 100%;" class="form-control" name="terminal" id="terminalName"
+          [(ngModel)]="filterOption.selectedTerminalId" (ngModelChange)="refreshData()"
+          [disabled]="filterOption.selectedDriverId !== 'all'|| !terminals.length">
+          <option value="all" selected>All Terminals</option>
+          <option *ngFor="let t of terminals" [value]="t.id">{{ t.name }}</option>
+        </select>
+      </div>
+      <div class="input-group col-lg-3 col-md-3 col-sm-12 col-xs-12 margin-top-10 w-100"
+        [ngClass]="{ 'has-error': selectDateRange.invalid }">
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+        <input [owlDateTimeTrigger]="dt" [owlDateTime]="dt" name="selectDateRange" [(ngModel)]="filterOption.dateRange"
+          [max]="currentDate" class="form-control" [selectMode]="'range'"
+          #selectDateRange="ngModel" (ngModelChange)="refreshData()">
+        <owl-date-time [pickerType]="'calendar'" #dt></owl-date-time>
+        <div *ngIf="selectDateRange.invalid" class="help-block text-danger">
+          <div class="small" *ngIf="selectDateRange.errors.owlDateTimeParse">Please select range
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="checkbox driver-id-checkbox">
+      <label>
+        <input type="checkbox" name="filterByDriverIdCheckbox" [(ngModel)]="filterOption.isFilterByDriverId" /> Filter
+        by Driver ID
+      </label>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+      <sa-datatable [options]="logEditsOption" #logEditsTable
+        tableClass="table table-striped table-bordered table-hover">
+        <thead>
+          <tr>
+            <th class="col"></th>
+            <th class="col">Driver Id</th>
+            <th class="col">Driver Name</th>
+            <th class="col">Vehicle</th>
+            <th class="col">Terminal</th>
+            <th class="col">Log Date/Time</th>
+            <th class="col">Status</th>
+            <th class="col">Changed By</th>
+            <th class="col">Date/Time of Edit</th>
+            <th class="col">Reason For Edit</th>
+          </tr>
+        </thead>
+      </sa-datatable>
+    </div>
+  </div>
+</div>

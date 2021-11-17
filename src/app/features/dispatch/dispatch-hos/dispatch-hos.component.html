@@ -1,0 +1,33 @@
+<ng-container *ngIf="loaded">
+    <ng-container *ngIf="!hosEnabled || !theDriver">
+        <i class="fa-fw fa fa-warning"></i>&nbsp;
+        <i>No HOS Available</i>
+    </ng-container>
+
+    <ng-container *ngIf="hosEnabled && theDriver">
+        <div class="form-group xsmall-form-group">
+            <label class="col-sm-6">Ruleset:</label>
+            <span class="col-sm-6">{{data.currentRuleset | naHandler}}</span>
+        </div>
+        <div class="form-group xsmall-form-group">
+            <label class="col-sm-6">Until Break:</label>
+            <span class="col-sm-6">{{data.untilBreak | naHandler}}</span>
+        </div>
+        <div class="form-group xsmall-form-group">
+            <label class="col-sm-6">Drive Left:</label>
+            <span class="col-sm-6">{{data.driveLeft | naHandler}}</span>
+        </div>
+        <div class="form-group xsmall-form-group">
+            <label class="col-sm-6">Shift Left:</label>
+            <span class="col-sm-6">{{data.shiftLeft | naHandler}}</span>
+        </div>
+        <div class="form-group xsmall-form-group">
+            <label class="col-sm-6">Cycle Left:</label>
+            <span class="col-sm-6">{{data.cycleLeft | naHandler}}</span>
+        </div>
+    </ng-container>
+</ng-container>
+
+<ng-container *ngIf="!loaded">
+    <i class="fa fa-refresh fa-spin"></i> Loading...
+</ng-container>

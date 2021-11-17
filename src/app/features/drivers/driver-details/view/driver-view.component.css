@@ -1,0 +1,16 @@
+.required-fields-container {
+    position: relative;
+    left: -5px;
+    border: 1px dotted #666;
+    border-radius: 3px;
+    padding: 5px 5px 0;
+    width: calc(100% + 10px);
+    margin-bottom: 10px;
+}
+
+.required-fields-text {
+    font-size: 10px;
+    position: absolute;
+    bottom: 0;
+    right: 15px;
+}

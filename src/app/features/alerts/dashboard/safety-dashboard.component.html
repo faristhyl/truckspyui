@@ -1,0 +1,152 @@
+<div id="content">
+    <div class="row">
+        <sa-big-breadcrumbs [items]="['Safety Dashboard']" icon="bell" class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+        </sa-big-breadcrumbs>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="pull-left col-sm-12 col-md-12 col-lg-6">
+                        <div style="width: 50%; max-width: 200px; margin-right: 25px; display: inline-block;">
+                            <label for="reportingProfileId">Reporting Profile:</label>
+                            <select style="width: 100%" data-select-search="true" select2 #reportingProfileSelect2
+                                name="reportingProfileId" id="reportingProfileId" [(ngModel)]="filters.reportingProfileId"
+                                (changedAction)="onReportingProfileIdChanged($event)"
+                                [disabled]="!reportingProfiles || reportingProfiles.length === 0">
+                                <option style="color: lightgray" value="">
+                                    All Profiles
+                                </option>
+                                <option *ngFor="let reportingProfile of reportingProfiles" [value]="reportingProfile.id">
+                                    {{reportingProfile.name}}
+                                </option>
+                            </select>
+                        </div>
+    
+                        <div style="width: 50%; max-width: 200px; display: inline-block;">
+                            <label for="dispatchGroup">Dispatch Group:</label>
+                            <select style="width: 100%" data-select-search="true" select2 #dispatchGroupSelect2
+                                name="dispatchGroup" id="dispatchGroup" [(ngModel)]="filters.dispatchGroupId"
+                                (changedAction)="onDispatchGroupIdChanged($event)"
+                                [disabled]="!dispatchGroups || dispatchGroups.length === 0">
+                                <option style="color: lightgray" value="">
+                                    All Groups
+                                </option>
+                                <option *ngFor="let dispatchGroup of dispatchGroups" [value]="dispatchGroup.id">
+                                    {{dispatchGroup.name}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pull-right col-sm-12 col-md-12 col-lg-6" style="margin-top: 11px;">
+                        <button class="pull-right btn btn-danger" type="submit"
+                            [class.filter-btn-active]="isTenthPercentile"
+                            (click)="filter10()">
+                            10th Percentile
+                        </button>
+                        <button class="pull-right btn btn-warning" style="margin-right: 5px;" type="submit"
+                            [class.filter-btn-active]="isFiftienthPercentile"
+                            (click)="filter50()">
+                            50th Percentile
+                        </button>
+                        <button class="pull-right btn btn-success" style="margin-right: 5px;" type="submit"
+                            [class.filter-btn-active]="isNinetiethPercentile"
+                            (click)="filter90()">
+                            90th Percentile
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="panel-body no-padding override-child-dataTable-margin override-no-pagination-dataTable-double">
+                    <sa-datatable [options]="options" tableClass="table table-striped table-bordered table-hover"
+                        #dashboardTable>
+                        <thead>
+                            <tr>
+                                <th class="col-sm-3">Driver</th>
+                                <th class="col-sm-3" id="header-column-1" style="text-align: center;">
+                                    Score&nbsp;|&nbsp;Mins/Miles&nbsp;|&nbsp;+&nbsp;|&nbsp;-
+                                </th>
+                                <th class="col-sm-3" id="header-column-2" style="text-align: center;">
+                                    Score&nbsp;|&nbsp;Mins/Miles&nbsp;|&nbsp;+&nbsp;|&nbsp;-
+                                </th>
+                                <th class="col-sm-3" id="header-column-3" style="text-align: center;">
+                                    Score&nbsp;|&nbsp;Mins/Miles&nbsp;|&nbsp;+&nbsp;|&nbsp;-
+                                </th>
+                            </tr>
+                        </thead>
+                    </sa-datatable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template class="modal-dialog" #waitModal>
+    <div class="modal-content" style="background-color: #ccc;">
+        <div class="modal-body">
+            Please wait, data is loading...&nbsp;&nbsp;&nbsp;
+            <button type="button" class="close" (click)="closeWaitModal()" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #scoreDetailModal>
+    <div class="modal-header">
+        <button type="button" class="close" (click)="closeScoreDetailModal()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Safety Score Detail</h4>
+    </div>
+    <div class="modal-body no-padding">
+        <div class="row" style="margin: 15px 5px 15px -10px;">
+            <div class="col-sm-12 col-md-6">
+                <div class="col-sm-3">
+                    <span for="score">Score:</span><br/>
+                    <b name="email">{{scoreDetailData.report.score}}</b>
+                </div>
+                <div class="col-sm-3">
+                    <span for="score">{{
+                        !scoreDetailData.report.drivingMinutes && !!scoreDetailData.report.drivingMiles ? "Miles" : "Minutes"
+                    }}:</span><br/>
+                    <b name="email">{{scoreDetailData.report.drivingMinutes || scoreDetailData.report.drivingMiles}}</b>
+                </div>
+                <div class="col-sm-3">
+                    <span for="score">Positive:</span><br/>
+                    <b name="email">{{scoreDetailData.report.positiveEventCount}}</b>
+                </div>
+                <div class="col-sm-3">
+                    <span for="score">Negative:</span><br/>
+                    <b name="email">{{scoreDetailData.report.negativeEventCount}}</b>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <a href="#/drivers/{{scoreDetailData.driver.id}}/view" class="pull-right" *ngIf="scoreDetailData.driver && scoreDetailData.driver.id">
+                    {{scoreDetailData.driver.name()}} ({{scoreDetailData.driver.remoteId || "(unspecified)"}})
+                </a><br/>
+                <span class="pull-right">
+                    {{scoreDetailData.report.reportPeriod.startedAt | timezoneHandler | date : 'MM/dd/yyyy'}}&nbsp;-&nbsp;{{scoreDetailData.report.reportPeriod.endedAt | timezoneHandler | date : 'MM/dd/yyyy'}}
+                </span>
+            </div>
+        </div>
+        <div class="panel-body no-padding override-child-dataTable-margin override-no-pagination-dataTable">
+            <sa-datatable [options]="optionsAlerts" tableClass="table table-striped table-bordered table-hover"
+                [dataTableId]="'alertsTable'">
+                <thead>
+                    <tr>
+                        <th class="col-sm-2">Event ID</th>
+                        <th class="col-sm-2">DateTime</th>
+                        <th class="col-sm-3">Location</th>
+                        <th class="col-sm-2">Description</th>
+                        <th class="col-sm-2">Severity</th>
+                        <th class="col-sm-1">Impact</th>
+                    </tr>
+                </thead>
+            </sa-datatable>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,13 @@
+.panel-body {
+    padding: 15px 0;
+}
+
+.filter-field {
+    margin-top: 10px;
+}
+
+.panel-heading-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

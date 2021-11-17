@@ -1,0 +1,43 @@
+<div id="content">
+    <div class="row">
+        <sa-big-breadcrumbs [items]="['Companies']" icon="building" class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+        </sa-big-breadcrumbs>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="pull-left">Companies</div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-body no-padding override-child-dataTable-margin">
+                    <sa-datatable [options]="options" tableClass="table table-striped table-bordered table-hover"
+                        #companiesTable>
+                        <thead>
+                            <tr>
+                                <th class="col-sm-4">Company</th>
+                                <th class="col-sm-3">Entity Identifier</th>
+                                <th class="col-sm-2">Number of Vehicles</th>
+                                <th class="col-sm-3">Week End</th>
+                            </tr>
+                        </thead>
+                        <thead class="filter-header">
+                            <tr>
+                                <td class="filter-valuable">
+                                    <div class="btn-group" style="width: 100%;">
+                                        <input class="form-control" style="width: 100%;" placeholder="Name Search..." name="name"
+                                            id="name" [(ngModel)]="filters.name" (ngModelChange)="onNameChanged()" type="text">
+                                        <span class="fa fa-times message-search-clear" (click)="clearName()"></span>
+                                    </div>
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                    </sa-datatable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

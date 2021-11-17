@@ -1,0 +1,9 @@
+#header ::ng-deep .select2 {
+    max-width: 270px;
+    margin-left: 10px;
+}
+
+#header ::ng-deep .select2-selection {
+    height: 22px;
+    line-height: 1.4;
+}

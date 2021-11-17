@@ -1,0 +1,32 @@
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <div class="panel panel-default">
+
+      <div class="panel-heading">
+        <div style="width: 60%" class="pull-left">Vehicle Utilization</div>
+        <div style="width: 40%; max-width: 200px;" class="pull-right">
+          <select style="width: 100%;" class="to-default" name="vehicle" id="vehicle"
+            [(ngModel)]="selectedVehicleId" (ngModelChange)="refreshData()" [disabled]="!vehicles">
+            <option value="" selected>All Vehicles</option>
+            <option *ngFor="let v of vehicles" [value]="v.vehicle_id">{{ v.remote_id || "(unspecified)"}}</option>
+          </select>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="panel-body no-padding override-child-dataTable-margin">
+        <sa-datatable [options]="vehicleUtilizationOption" #vehicleUtilizationTable
+          tableClass="table table-striped table-bordered table-hover">
+          <thead>
+            <tr>
+              <th class="col-sm-4">Vehicle</th>
+              <th class="col-sm-4">Begin</th>
+              <th class="col-sm-4">End</th>
+            </tr>
+          </thead>
+        </sa-datatable>
+      </div>
+
+    </div>
+  </div>
+</div>

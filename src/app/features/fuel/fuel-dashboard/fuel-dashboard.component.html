@@ -1,0 +1,131 @@
+<div id="content">
+    <div class="row">
+        <sa-big-breadcrumbs [items]="['Fuel', 'Optimizer']" icon="fire" class="col-xs-8">
+        </sa-big-breadcrumbs>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-info fade in">
+                Prices depicted in this tool are only available to customers using the TruckSpy Fuel Program.
+                These prices are updated daily and do not account for mid-day price changes.
+                If you are interested in enrolling in the program, contact us at <a href="mailto:support@truckspy.io">support@truckspy.io</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="row row-equal">
+            <div class="col-sm-3 col-md-3 col-lg-3">
+                <div class="fuel-stations-list row">
+                    <h4 class="fuel-stations-list__title">
+                        Fuel Locations
+                    </h4>
+                    <div class="row list-group-row">
+                        <div class="list-group">
+                            <ng-container *ngFor="let station of displayStations">
+                                <a (click)="displayModal(station, null)"
+                                    class="list-group-item fuel-stations-list__item"
+                                    [class.active]="station?.id === selectedElement?.id">
+                                    <h4 class="list-group-item-heading">{{station.name}}</h4>
+                                    <p class="list-group-item-text">{{station.address1}}</p>
+                                    <p class="list-group-item-text">{{station.address2}}</p>
+                                    <p class="list-group-item-text">{{station.city}}, {{station.state}}</p>
+                                    <p class="list-group-item-text fuel-stations-list__item-amenities">
+                                        {{station.amenities.join(', ')}}
+                                    </p>
+                                    <div class="fuel-stations-list__item-prices">
+                                        <p class="list-group-item-text">n. ${{station.netPrice}}</p>
+                                        <p class="list-group-item-text">t. ${{station.taxRate}}</p>
+                                        <p class="list-group-item-text">g. ${{station.totalPrice}}</p>
+                                    </div>
+                                    <span class="item-bottom-line"></span>
+                                </a>
+                            </ng-container>
+                        </div>
+                    </div>
+                    <ngb-pagination [boundaryLinks]="false" [collectionSize]="stationsLength || 0" [(page)]="page"
+                        [pageSize]="perPage" [maxSize]="2" [rotate]="true" [ellipses]="true"
+                        (pageChange)="changePage($event)" aria-label="Default pagination" size="sm"
+                        *ngIf="stationsLength > 0">
+                        <ng-template ngbPaginationPrevious>
+                            &lt;
+                        </ng-template>
+                        <ng-template ngbPaginationNext>
+                            &gt;
+                        </ng-template>
+                    </ngb-pagination>
+                </div>
+            </div>
+
+            <div class="col-sm-9 col-md-9 col-lg-9 h-100">
+                <div class="row">
+                    <mgl-map [style]="style" [fitBoundsOptions]="fitBoundsOptions" (load)="onLoad($event)"
+                        [fitBounds]="fitBounds">
+
+                        <mgl-control>
+                            <button class="btn btn-xs btn-default" (click)="toggleStyle()">
+                                <i class="fa" [ngClass]="{ 'fa-camera': isDefault, 'fa-road': !isDefault }"></i>
+                                {{isDefault ? "Satellite" : "Streets"}}
+                            </button>
+                        </mgl-control>
+
+                        <mgl-control [position]="'top-left'">
+                            <div class="fix-searchPlaces">
+                                <input type="text" placeholder="Search near..."
+                                    [resultTemplate]="searchTemplate" [ngbTypeahead]="searchPlaces"
+                                    (selectItem)="clickSelected($event)" #searchInput="ngbTypeahead"
+                                    (focus)="focus$.next($event.target.value)" (click)="click$.next($event.target.value)"
+                                    [(ngModel)]="model" class="mapbox-typeahead" />
+                                <ng-template #searchTemplate let-r="result" let-t="term">
+                                    <i class="fa fa-map-marker"></i>&nbsp;
+                                    <ngb-highlight [result]="r?.place_name" [term]="t"></ngb-highlight>
+                                </ng-template>
+
+                                <select class="radius-select" name="radius" [(ngModel)]="radius" (ngModelChange)="onRadiusChange($event)">
+                                    <option *ngFor="let r of radiuses" [value]="r">{{r + " miles range"}}</option>
+                                </select>
+                            </div>
+                        </mgl-control>
+
+                        <mgl-geojson-source id="locations-source-point">
+                            <ng-container *ngFor="let station of stations">
+                                <mgl-feature [properties]="{ asString: station }"
+                                    [geometry]="{ type: 'Point', coordinates: [station.longitude, station.latitude] }">
+                                </mgl-feature>
+                            </ng-container>
+                        </mgl-geojson-source>
+
+                        <mgl-image id="pin-image" url="https://api.tiles.mapbox.com/v3/marker/pin-s+FE2020.png"
+                            (loaded)="imageLoaded = true">
+                        </mgl-image>
+
+                        <mgl-layer *ngIf="imageLoaded" id="locations-layer-point" type="symbol"
+                            source="locations-source-point" [layout]="{
+                                'icon-image': 'pin-image',
+                                'icon-size': 2,
+                                'icon-allow-overlap': true
+                            }" (mouseEnter)="cursorStyle = 'pointer'" (mouseLeave)="cursorStyle = ''" (click)="onClick($event)">
+                        </mgl-layer>
+
+                        <mgl-popup *ngIf="selectedLngLat" [lngLat]="selectedLngLat" (close)="closePopup()" #thePopup>
+                            <div class="fuel-stations-list__item" style="padding-bottom: 0;">
+                                <h4 class="list-group-item-heading">{{selectedElement.name}}</h4>
+                                <p class="list-group-item-text">{{selectedElement.address1}}</p>
+                                <p class="list-group-item-text">{{selectedElement.city}}, {{selectedElement.state}}</p>
+                                <p class="list-group-item-text fuel-stations-list__item-amenities" style="margin-top: 20px;">
+                                    {{selectedElement.amenities.join(', ')}}
+                                </p>
+                                <div class="fuel-stations-list__item-prices fuel-stations-list__item-prices_popup">
+                                    <p class="list-group-item-text">n. ${{selectedElement.netPrice}}</p>
+                                    <p class="list-group-item-text">t. ${{selectedElement.taxRate}}</p>
+                                    <p class="list-group-item-text">g. ${{selectedElement.totalPrice}}</p>
+                                </div>
+                            </div>
+                        </mgl-popup>
+                    </mgl-map>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

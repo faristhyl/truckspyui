@@ -1,0 +1,15 @@
+.control-label {
+    margin-bottom: 8px;
+    margin-right: 10px;
+}
+
+.pull-right {
+    margin-left: 10px;
+}
+
+.panel-heading-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}

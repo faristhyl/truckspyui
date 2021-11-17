@@ -1,0 +1,275 @@
+<aside id="left-panel" [style.padding-top]="loggedInAs ? '79px' : '49px'">
+
+  <!-- User info -->
+  <sa-login-info></sa-login-info>
+  <!-- end user info -->
+
+  <nav>
+    <!-- NOTE: Notice the gaps after each icon usage <i></i>..
+    Please note that these links work a bit different than
+    traditional href="" links. See documentation for details.
+    -->
+
+    <ul saSmartMenu>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isAdmin()">
+        <a routerLink="/admin/dashboard" title="Dashboard">
+          <i class="fa fa-lg fa-fw fa-desktop"></i>
+          <span class="menu-item-parent">{{'Dashboard' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isAdmin()">
+        <a routerLink="/admin/companies" title="Companies">
+          <i class="fa fa-lg fa-fw fa-building"></i>
+          <span class="menu-item-parent">{{'Companies' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isAdmin()">
+        <a routerLink="/admin/users" title="Users">
+          <i class="fa fa-lg fa-fw fa-users"></i>
+          <span class="menu-item-parent">{{'Users' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isAdmin()">
+        <a routerLink="/admin/system" title="System">
+          <i class="fa fa-lg fa-fw fa-tasks"></i>
+          <span class="menu-item-parent">{{'System' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isAdmin()">
+        <a routerLink="/admin/invoices" title="Invoices">
+          <i class="fa fa-lg fa-fw fa-money"></i>
+          <span class="menu-item-parent">{{'Invoices' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isAdmin()">
+        <a routerLink="/admin/connections" title="Connections">
+          <i class="fa fa-lg fa-fw fa-link"></i>
+          <span class="menu-item-parent">{{'Connections' | i18n}}</span>
+        </a>
+      </li>
+
+      <li *ngIf="theUser() && theUser().isAdmin()">
+        <a href="#"><i class="fa fa-lg fa-fw fa-map-marker"></i>
+          <span class="menu-item-parent">{{'Locations' | i18n}}</span>
+        </a>
+        <ul>
+          <li routerLinkActive="active">
+            <a routerLink="/admin/location/groups">{{'Groups' | i18n}}</a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/admin/location/locations">{{'Map' | i18n}}</a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/admin/location/list">{{'List' | i18n}}</a>
+          </li>
+        </ul>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isAdmin()">
+        <a routerLink="/admin/devices" title="Devices">
+          <i class="fa fa-lg fa-fw fa-tablet"></i>
+          <span class="menu-item-parent">{{'Devices' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isThirdParty()">
+        <a routerLink="/third-party/companies" title="Companies">
+          <i class="fa fa-lg fa-fw fa-building"></i>
+          <span class="menu-item-parent">{{'Companies' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isThirdParty()">
+        <a routerLink="/third-party//vehicles" title="Vehicles">
+          <i class="fa fa-lg fa-fw fa-truck"></i>
+          <span class="menu-item-parent">{{'Vehicles' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser()">
+        <a routerLink="/dashboard" title="Dashboard">
+          <i class="fa fa-lg fa-fw fa-desktop"></i>
+          <span class="menu-item-parent">{{'Dashboard' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser()">
+        <a routerLink="/vehicles" title="Vehicles">
+          <i class="fa fa-lg fa-fw fa-truck"></i>
+          <span class="menu-item-parent">{{'Vehicles' | i18n}}</span>
+        </a>
+      </li>
+
+      <li *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().devicesEnabled && !theCompany().cameraOnly">
+        <a href="#"><i class="fa fa-lg fa-fw fa-check-square-o"></i>
+          <span class="menu-item-parent">{{'Inspection' | i18n}}</span>
+        </a>
+        <ul>
+          <li routerLinkActive="active">
+            <a routerLink="/inspection/configuration">{{'Configuration' | i18n}}</a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/inspection/list">{{'List' | i18n}}</a>
+          </li>
+        </ul>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser()">
+        <a routerLink="/drivers" title="Drivers">
+          <i class="fa fa-lg fa-fw fa-user"></i>
+          <span class="menu-item-parent">{{'Drivers' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().devicesEnabled && !theCompany().cameraOnly">
+        <a routerLink="/messages" title="Messages">
+          <i class="fa fa-lg fa-fw fa-envelope"></i>
+          <span class="menu-item-parent">{{'Messages' | i18n}}</span>
+        </a>
+      </li>
+
+      <li *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().devicesEnabled">
+        <a href="#" title="Safety Alerts">
+          <i class="fa fa-lg fa-fw fa-bell"></i>
+          <span class="menu-item-parent">{{'Safety Alerts' | i18n}}</span>
+        </a>
+        <ul>
+          <li routerLinkActive="active">
+            <a routerLink="/alerts/dashboard">{{'Safety Dashboard' | i18n}}</a>
+          </li>
+          <li [class.active]="getCurrentUrl() === '/alerts'">
+            <a routerLink="/alerts">{{'Video Alerts' | i18n}}</a>
+          </li>
+          <!-- <li routerLinkActive="active">
+            <a routerLink="/alerts/video">{{'Requested Video' | i18n}}</a>
+          </li> -->
+        </ul>
+      </li>
+
+      <li *ngIf="theUser() && theUser().isUser()">
+        <a href="#"><i class="fa fa-lg fa-fw fa-map-marker"></i>
+          <span class="menu-item-parent">{{'Locations' | i18n}}</span>
+        </a>
+        <ul>
+          <li routerLinkActive="active">
+            <a routerLink="/location/groups">{{'Groups' | i18n}}</a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/location/locations">{{'Map' | i18n}}</a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/location/list">{{'List' | i18n}}</a>
+          </li>
+        </ul>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().devicesEnabled">
+        <a routerLink="/devices" title="Devices">
+          <i class="fa fa-lg fa-fw fa-tablet"></i>
+          <span class="menu-item-parent">{{'Devices' | i18n}}</span>
+        </a>
+      </li>
+
+      <li *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.fuel">
+        <a href="#" title="Fuel">
+          <i class="fa fa-lg fa-fw fa-fire"></i>
+          <span class="menu-item-parent">{{'Fuel' | i18n}}</span>
+        </a>
+        <ul>
+          <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.truckspyFuel">
+            <a routerLink="/fuel/dashboard">{{'Optimizer' | i18n}}</a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/fuel/list">{{'List' | i18n}}</a>
+          </li>
+        </ul>
+      </li>
+
+      <li routerLinkActive="active"
+          *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.groundBiz">
+        <a routerLink="/linehaul-trips" title="Linehaul Trips">
+          <i class="fa fa-lg fa-fw fa-road" aria-hidden="true"></i>
+          <span class="menu-item-parent">{{'Linehaul Trips' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser()">
+        <a routerLink="/reporting" title="Reporting Profiles">
+          <i class="fa fa-lg fa-fw fa-files-o"></i>
+          <span class="menu-item-parent">{{'Reporting Profiles' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser()">
+        <a routerLink="/reports" title="Reports">
+          <i class="fa fa-lg fa-fw fa-bar-chart-o"></i>
+          <span class="menu-item-parent">{{'Reports' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.dispatching">
+        <a routerLink="/dispatch" title="Dispatch">
+          <i class="fa fa-lg fa-fw fa-taxi"></i>
+          <span class="menu-item-parent">{{'Dispatch' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.dispatching">
+        <a routerLink="/bookings" title="Bookings">
+          <i class="fa fa-lg fa-fw fa-calendar"></i>
+          <span class="menu-item-parent">{{'Bookings' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.dispatching">
+        <a routerLink="/customers" title="Customers">
+          <i class="fa fa-lg fa-fw fa-group"></i>
+          <span class="menu-item-parent">{{'Customers' | i18n}}</span>
+        </a>
+      </li>
+
+      <li routerLinkActive="active" *ngIf="theUser() && theUser().isUser()">
+        <a  routerLink="/company" title="Company">
+          <i class="fa fa-lg fa-fw fa-building"></i>
+          <span class="menu-item-parent">{{'Company' | i18n}}</span>
+        </a>
+      </li>
+
+      <li *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.maintenance">
+        <a href="#"><i class="fa fa-lg fa-fw fa-cogs"></i>
+          <span class="menu-item-parent">{{'Maintenance' | i18n}}</span>
+        </a>
+        <ul>
+          <li routerLinkActive="active">
+            <a routerLink="/maintenance/scheduled-dashboard">{{'Scheduled Dashboard' | i18n}}</a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/maintenance/issues">{{'Issues' | i18n}}</a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/maintenance/workorders">{{'Work Orders' | i18n}}</a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/maintenance/configuration">{{'Configuration' | i18n}}</a>
+          </li>
+        </ul>
+      </li>
+      <li routerLinkActive="active"
+          *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.hoursOfService">
+        <a routerLink="/hours" title="Hours of Service">
+          <i class="fa fa-lg fa-fw fa-clock-o"></i>
+          <span class="menu-item-parent">{{ 'Hours of Service' | i18n }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <sa-minify-menu></sa-minify-menu>
+
+</aside>

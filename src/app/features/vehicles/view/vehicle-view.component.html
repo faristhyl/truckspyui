@@ -1,0 +1,135 @@
+<div id="content">
+    <div class="row">
+        <sa-big-breadcrumbs [items]="['Vehicles', vehicle.remoteId]" icon="truck"
+            class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+        </sa-big-breadcrumbs>
+    </div>
+
+    <div class="row" *ngIf="isLoaded">
+        <div class="col-sm-2 col-md-2 col-lg-2"
+            style="min-height: 100vh; width: calc(176px + 1px); display: inline-block; vertical-align: top;">
+            <ul class="inbox-menu-lg menu-lg-darkmode">
+                <li [class.active]="childPath == 'view'">
+                    <a [routerLink]="['view']">General Info</a>
+                </li>
+                <li *ngIf="theCompany() && theCompany().devicesEnabled" [class.active]="childPath == 'alerts'">
+                    <a [routerLink]="['alerts']">Safety Alerts</a>
+                </li>
+                <li *ngIf="theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.maintenance" [class.active]="childPath == 'maintenance'">
+                    <a [routerLink]="['maintenance']">Maintenance</a>
+                </li>
+                <li *ngIf="theCompany() && theCompany().devicesEnabled" [class.active]="childPath == 'inspections'">
+                    <a [routerLink]="['inspections']">Inspections</a>
+                </li>
+                <li *ngIf="theCompany() && theCompany().devicesEnabled" [class.active]="childPath == 'events'">
+                    <a [routerLink]="['events']">Events</a>
+                </li>
+                <li *ngIf="theCompany() && theCompany().enabledFeatures && theCompany().enabledFeatures.fuel" [class.active]="childPath == 'fuel'">
+                    <a [routerLink]="['fuel']">Fuel</a>
+                </li>
+                <li [class.active]="childPath == 'utilization'">
+                    <a [routerLink]="['utilization']">Vehicle Utilization</a>
+                </li>
+            </ul>
+
+            <ng-container *ngIf="theCompany() && theCompany().devicesEnabled">
+                <ng-container *ngIf="engineLoaded">
+                    <div class="form-horizontal" style="margin-left: 5px;" *ngIf="!engineSnapshot">
+                        <div class="form-group form-group-closer">
+                            <label class="col-sm-12">
+                                <small><i>
+                                    No Engine Data Available
+                                </i></small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-horizontal" style="margin-left: 5px;" *ngIf="engineSnapshot">
+                        <div class="form-group form-group-closer">
+                            <label class="col-sm-4">Engine</label>
+                            <div class="col-sm-8">
+                                {{
+                                    engineSnapshot.position.ignition == null
+                                    ? 'Unknown'
+                                    : (!!engineSnapshot.position.ignition ? 'ON' : 'OFF')
+                                }}
+                            </div>
+                        </div>
+                        <div class="form-group form-group-closer">
+                            <label class="col-sm-4">Speed</label>
+                            <div class="col-sm-8">
+                                {{engineSnapshot.position.speed + " mph"}}
+                            </div>
+                        </div>
+                        <div class="form-group form-group-closer">
+                            <label class="col-sm-4">Idling</label>
+                            <div class="col-sm-8">
+                                {{
+                                    engineSnapshot.position.idling == null
+                                    ? 'Unknown'
+                                    : (!!engineSnapshot.position.idling ? 'YES' : 'NO')
+                                }}
+                            </div>
+                        </div>
+
+                        <div class="form-group form-group-closer">
+                            <label class="col-sm-4">Fuel</label>
+                            <div class="col-sm-8">
+                                <div class="progress progress-xs" style="margin: 0px;">
+                                    <div class="progress-bar" role="progressbar" [ngStyle]="getProgressStyles(engineSnapshot.position.fuelLevel)"></div>
+                                </div>
+                                <small>{{engineSnapshot.position.fuelLevel + '%'}}</small>
+                            </div>
+                        </div>
+                        <div class="form-group form-group-closer">
+                            <label class="col-sm-4">DEF</label>
+                            <div class="col-sm-8">
+                                <div class="progress progress-xs" style="margin: 0px;">
+                                    <div class="progress-bar" role="progressbar" [ngStyle]="getProgressStyles(engineSnapshot.position.defLevel)"></div>
+                                </div>
+                                <small>{{engineSnapshot.position.defLevel + '%'}}</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group form-group-closer">
+                            <label class="col-sm-4">Hours</label>
+                            <div class="col-sm-8">
+                                {{engineSnapshot.position.engineHours + " hrs"}}
+                            </div>
+                        </div>
+                        <div class="form-group form-group-closer">
+                            <label class="col-sm-4">Odo</label>
+                            <div class="col-sm-8">
+                                {{!!engineSnapshot.position.odometer ? engineSnapshot.position.odometer + " mi" : "N/A"}}
+                            </div>
+                        </div>
+
+                        <div class="form-group form-group-closer">
+                            <label class="col-sm-4">Driver</label>
+                            <div class="col-sm-8">
+                                <ng-container *ngIf="!!engineSnapshot.driver?.id">
+                                    <a href="#/drivers/{{engineSnapshot.driver.id}}/view">
+                                        {{engineSnapshot.driver.name() + ' (' + (engineSnapshot.driver.remoteId || '(unspecified)') + ')'}}
+                                    </a>
+                                </ng-container>
+                                <ng-container *ngIf="!engineSnapshot.driver?.id">
+                                    N/A
+                                </ng-container>
+                            </div>
+                        </div>
+
+                        <div class="form-group form-group-closer">
+                            <label class="col-sm-12">
+                                {{engineSnapshot.locationString}}<br/>
+                                <i>{{"Updated " + engineSnapshot.timeAgo}}</i>
+                            </label>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </div>
+        <div class="col-sm-10 col-md-10 col-lg-10" style="width: calc(100% - 177px); display: inline-block;">
+            <router-outlet #o="outlet"></router-outlet>
+        </div>
+    </div>
+</div>

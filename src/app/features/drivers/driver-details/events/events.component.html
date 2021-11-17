@@ -1,0 +1,38 @@
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <div class="panel panel-default">
+
+      <div class="panel-heading">
+        <div style="width: 40%" class="pull-left">Events</div>
+        <div style="width: 60%; max-width: 300px;" class="pull-right">
+          <ng-select [items]="displayEvents" bindLabel="display" bindValue="event" [multiple]="true"
+            [closeOnSelect]="false" placeholder="All Events" (change)="refreshData()" name="event"
+            [(ngModel)]="selectedEvents" required class="to-default" dropdownPosition="bottom">
+            <ng-template ng-header-tmp style="padding: 0px;">
+              <button type="button" class="btn btn-xs btn-link" style="width: 100%;" (click)="onSelectAllEvents()">Select All</button>
+            </ng-template>
+            <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+              <app-ng-select-custom-template bindLabelName="display" [items]="items" [clear]="clear">
+              </app-ng-select-custom-template>
+            </ng-template>
+          </ng-select>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="panel-body no-padding override-child-dataTable-margin">
+        <sa-datatable [options]="eventsOption" #eventsTable tableClass="table table-striped table-bordered table-hover">
+          <thead>
+            <tr>
+              <th class="col-sm-3">Datetime</th>
+              <th class="col-1_4">Event Type</th>
+              <th class="col-1_6">Location</th>
+              <th class="col-sm-6">Context</th>
+            </tr>
+          </thead>
+        </sa-datatable>
+      </div>
+
+    </div>
+  </div>
+</div>

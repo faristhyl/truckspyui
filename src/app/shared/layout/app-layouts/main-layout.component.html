@@ -1,0 +1,17 @@
+<sa-header></sa-header>
+<sa-navigation></sa-navigation>
+
+<div id="main" role="main" [@routerTransition]="getState(o)">
+  <sa-search-switcher *ngIf="theUser() && theUser().isUser() && theCompany() && theCompany().devicesEnabled">
+  </sa-search-switcher>
+
+  <sa-layout-switcher></sa-layout-switcher>
+
+  <sa-ribbon></sa-ribbon>
+
+  <router-outlet #o="outlet"></router-outlet>
+</div>
+
+<sa-footer></sa-footer>
+
+<sa-shortcut></sa-shortcut>

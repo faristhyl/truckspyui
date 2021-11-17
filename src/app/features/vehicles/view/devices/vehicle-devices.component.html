@@ -1,0 +1,49 @@
+<div class="panel panel-default">
+  <div class="panel-heading">Devices</div>
+
+  <div class="panel-body no-padding override-child-dataTable-margin">
+    <sa-datatable [options]="options" tableClass="table table-striped table-bordered table-hover minimize-on-small" #theDevicesTable>
+      <thead>
+        <tr>
+          <th class="col-sm-4">Device ID</th>
+          <th class="col-sm-2">Device Type</th>
+          <th class="col-sm-3">IMEI</th>
+          <th class="col-1_5">Last Communication</th>
+          <th class="col-1_5">Force To Vehicle</th>
+        </tr>
+      </thead>
+      <thead class="filter-header">
+        <tr>
+          <td class="filter-valuable">
+            <div class="btn-group" style="width: 100%;">
+              <input class="form-control" style="width: 100%;" placeholder="Device ID Search..." name="iccid"
+                [disabled]="!devices" id="iccid" [(ngModel)]="filters.iccid" (ngModelChange)="doFilter()" type="text">
+              <span class="fa fa-times message-search-clear" (click)="clearIccid()"></span>
+            </div>
+          </td>
+          <td class="filter-valuable">
+            <select style="width: 100%" data-select-search="true" select2 name="deviceType"
+                    [(ngModel)]="filters.deviceType" (changedAction)="onDeviceTypeChanged($event)"
+                    [chooseOnTab]="true" [disabled]="!deviceTypes">
+              <option style="color: lightgray" value="">
+                All Devices
+              </option>
+              <option *ngFor="let c of deviceTypes" [value]="c">
+                {{ c | replaceUnderscore }}
+              </option>
+            </select>
+          </td>
+          <td class="filter-valuable">
+            <div class="btn-group" style="width: 100%;">
+              <input class="form-control" style="width: 100%;" placeholder="IMEI Search..." name="imei" id="imei"
+                [disabled]="!devices" [(ngModel)]="filters.imei" (ngModelChange)="doFilter()" type="text">
+              <span class="fa fa-times message-search-clear" (click)="clearImei()"></span>
+            </div>
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+      </thead>
+    </sa-datatable>
+  </div>
+</div>

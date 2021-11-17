@@ -1,0 +1,85 @@
+<div id="content">
+    <div class="row">
+        <sa-big-breadcrumbs [items]="['Vehicles']" icon="truck" class="col-xs-4">
+        </sa-big-breadcrumbs>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="pull-left">Vehicles</div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-body no-padding override-child-dataTable-margin" *ngIf="tableColumns.length > 0">
+                    <sa-datatable [options]="options" [dataTableColumns]="tableColumns"
+                        (selectedColumnsToSave)="saveSelectedColumns($event)" #vehiclesTable
+                        tableClass="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="col-sm-2">Vehicle</th>
+                                <th class="col-sm-2">Company</th>
+                                <th class="col-sm-2">Status</th>
+                                <th class="col-sm-2">Domicile</th>
+                                <th class="col-sm-2">Last Communication</th>
+                                <th class="col-sm-2">Data Through</th>
+                            </tr>
+                        </thead>
+                        <thead class="filter-header">
+                            <tr>
+                                <td class="filter-valuable">
+                                    <div class="btn-group" style="width: 100%;">
+                                        <input class="form-control" style="width: 100%;" placeholder="Vehicle Search..."
+                                            name="remoteId" id="remoteId" [(ngModel)]="filters.remoteId"
+                                            (ngModelChange)="onRemoteIdChanged($event)" type="text">
+                                        <span class="fa fa-times message-search-clear" (click)="clearVehicle()"></span>
+                                    </div>
+                                </td>
+                                <td class="filter-valuable">
+                                    <select style="width: 100%" data-select-search="true" select2 #profileSelect2
+                                        name="reportingProfileId" [(ngModel)]="filters.reportingProfileId"
+                                        (changedAction)="onReportProfileChanged($event)" [chooseOnTab]="true"
+                                        [disabled]="!reportingProfiles || reportingProfiles.length === 0">
+                                        <option style="color: lightgray" value="">
+                                            All Reporting Profile
+                                        </option>
+                                        <option *ngFor="let r of reportingProfiles" [value]="r.id">
+                                            {{r.name}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td class="filter-valuable">
+                                    <select style="width: 100%" data-select-search="true" select2 name="status"
+                                        [(ngModel)]="filters.status" (changedAction)="onStatusChanged($event)"
+                                        [chooseOnTab]="true" [disabled]="!statuses">
+                                        <option style="color: lightgray" value="">
+                                            All Statuses
+                                        </option>
+                                        <option *ngFor="let s of statuses" [value]="s">
+                                            {{s}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td class="filter-valuable">
+                                    <select style="width: 100%" data-select-search="true" select2 #locationSelect2
+                                        name="locationId" [(ngModel)]="filters.domicileLocationId"
+                                        (changedAction)="onLocationsChanged($event)" [chooseOnTab]="true"
+                                        [disabled]="!locations || locations.length === 0">
+                                        <option style="color: lightgray" value="">
+                                            All Domicile
+                                        </option>
+                                        <option *ngFor="let l of locations" [value]="l.id">
+                                            {{l.name}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                    </sa-datatable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

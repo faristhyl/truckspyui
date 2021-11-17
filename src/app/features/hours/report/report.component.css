@@ -1,0 +1,84 @@
+.report-button {
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
+  cursor: pointer;
+  margin: 5px 5px 25px 5px;
+  min-height: 95px;
+  max-height: 95px;
+}
+
+.report-box-icon {
+  height: 100%;
+  text-align: center;
+  line-height: 95px;
+}
+
+.report-box-icon i {
+  font-size: 3.5em;
+  line-height: 1.5;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.report-box-text {
+  /* font-size: 20px;
+  line-height: 95px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; */
+  font-size: 20px;
+  height: 5em;
+  display: flex;
+  align-items: center;
+}
+
+.report-box-text span {
+  line-height: 1.5;
+  /* vertical-align: middle; */
+}
+
+.driver-box-selection {
+  min-height: 100px;
+  max-height: 300px;
+  overflow-y: scroll;
+}
+
+.driver-box-inner {
+  padding: 5px 0px 5px 5px;
+}
+
+.driver-box-inner:hover {
+  background-color: rgb(150, 150, 150);
+}
+
+.driver-box-selected {
+  background-color: rgb(150, 150, 150);
+}
+
+.modal-md {
+  width: 650px;
+}
+
+@media (min-width: 992px) {
+  .modal-lg {
+    max-width: 980px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .modal-lg {
+    max-width: 1150px;
+  }
+}
+
+.modal-70 {
+  width: 70%;
+}
+
+.modal-80 {
+  width: 80%;
+}
+
+.width-50 {
+  width: 50%;
+}

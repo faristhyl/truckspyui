@@ -1,0 +1,26 @@
+<div id="content" class="panel panel-default">
+  <div class="panel panel-body">
+    <div class="row margin-top-1">
+      <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12" *ngFor="let report of reportModalDataArr"
+        (click)="onOpenReportModel(report.nameSlag)">
+        <div class="row report-button">
+          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 bg-primary report-box-icon">
+            <i class="fa fa-calendar-check-o"></i>
+          </div>
+          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 report-box-text">
+            <span>
+              {{report.name}}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<ng-template #reportModal>
+  <app-report-modal [reportModalData]="reportModalData" [modalType]="modalType" [_reportModal]="_reportModal"
+    [allRerports]="allRerports">
+  </app-report-modal>
+</ng-template>

@@ -1,0 +1,243 @@
+<div id="content" class="panel panel-default">
+  <div class="panel-heading panel-heading-flex">
+    <b>Unidentified Driving</b>
+    <button class="btn btn-primary" (click)="downloadExcel()">Download Excel</button>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <button class="btn btn-primary pull-right" (click)="onBulkAssign()">
+          Bulk Assign
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 col-md-4 col-sm-12 margin-top-10" *ngIf="vehicles.length > 0">
+        <ng-select class="w-100 vehicle-select" [items]="vehicles" bindLabel="name" bindValue="id" [multiple]="true"
+          [closeOnSelect]="false" placeholder="All Vehicles" [(ngModel)]="filterOption.selectedVehicleId"
+          (change)="refreshData()">
+          <ng-template ng-header-tmp>
+            <div>
+              <button class="btn btn-link" (click)="onSelectAllVehicles()">Select All</button>
+            </div>
+          </ng-template>
+          <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+            <app-ng-select-custom-template bindLabelName="name" [items]="items" [clear]="clear">
+            </app-ng-select-custom-template>
+          </ng-template>
+        </ng-select>
+      </div>
+      <div class="col-lg-4 col-md-4 col-sm-12 margin-top-10">
+        <select style="width: 100%;" class="form-control" name="terminal" id="terminalName"
+          [(ngModel)]="filterOption.selectedTerminalId" (ngModelChange)="refreshData()" [disabled]="!terminals.length">
+          <option value="all" selected>All Terminals</option>
+          <option *ngFor="let t of terminals" [value]="t.id">
+            {{ t.name }}
+          </option>
+        </select>
+      </div>
+      <div class="col-lg-4 col-md-4 col-12 w-100 margin-top-10">
+        <div class="input-group" [ngClass]="{ 'has-error': selectDateRange.invalid }">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+          <input [owlDateTimeTrigger]="dt" [owlDateTime]="dt" name="selectDateRange" [(ngModel)]="filterOption.dateRange"
+            [max]="currentDate" class="form-control" [selectMode]="'range'" #selectDateRange="ngModel"
+            (ngModelChange)="refreshData()" />
+          <owl-date-time [pickerType]="'calendar'" #dt></owl-date-time>
+          <div *ngIf="selectDateRange.invalid" class="help-block text-danger">
+            <div class="small" *ngIf="selectDateRange.errors.owlDateTimeParse">
+              Please select range
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- hide it temporary -> task https://github.com/truckspy/truckspyui/issues/542 -->
+      <!-- <div class="row">
+        <div class="col-12 col-md-2">
+          <div class="checkbox px-1">
+            <label>
+              <input type="checkbox" name="unassignedCheckbox" [(ngModel)]="filterOption.isUnassigned"
+                (change)="refreshData()" />Unassigned
+            </label>
+          </div>
+        </div>
+        <div class="col-12 col-md-2">
+          <div class="checkbox px-1">
+            <label>
+              <input type="checkbox" name="classifiedCheckbox" [(ngModel)]="filterOption.isClassified"
+                (change)="refreshData()" />Classified
+            </label>
+          </div>
+        </div>
+      </div> -->
+    <!-- *** -->
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+      <div class="panel-body no-padding override-child-dataTable-margin table-responsive">
+        <sa-datatable [options]="undefinedDrivingEventOption" #undefinedDrivingEventTable
+          tableClass="table table-striped table-bordered table-hover">
+          <thead>
+            <tr>
+              <th class="col-sm-1">Date/Time</th>
+              <th class="col-sm-1">End Date/Time</th>
+              <th class="col-sm-1">Event</th>
+              <th class="col-sm-1">Vin</th>
+              <th class="col-sm-1">Vehicle</th>
+              <th class="col-sm-1">Location</th>
+              <th class="col-sm-1">Lat / Lon</th>
+              <th class="col-sm-1">Start / End Odometer</th>
+              <th class="col-sm-1">Accumulated Miles</th>
+              <th class="col-sm-1">Note</th>
+              <th class="col-sm-1">Action</th>
+            </tr>
+          </thead>
+        </sa-datatable>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Single assign unidentified driving event modal -->
+<ng-template class="modal-dialog" #singleAssignModal>
+  <div class="modal-content">
+    <div class="modal-header bg-primary">
+      <button type="button" class="close" (click)="closeSingleAssignModal()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h4 class="modal-title">Assign Unidentified Driving</h4>
+    </div>
+    <form class="form-horizontal" #saveSingleAssignForm="ngForm"
+      (ngSubmit)="saveSingleAssignForm.form.valid && onSaveSingleAssign()">
+      <div class="modal-body">
+        <div class="row margin-top-10">
+          <div class="col-sm-12">
+            <div [ngClass]="{
+                'has-error': saveSingleAssignForm.submitted && note.invalid
+              }">
+              <label for="note">note</label>
+              <textarea class="form-control" id="note" name="note" type="number" [(ngModel)]="singleAssignData.note"
+                placeholder="Enter Note" #note="ngModel" rows="3" required></textarea>
+              <div *ngIf="saveSingleAssignForm.submitted && note.invalid" class="help-block">
+                <div class="small" *ngIf="note.errors.required">
+                  Please enter note
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row margin-top-10">
+          <div class="col-sm-12">
+            <div [ngClass]="{
+                'has-error': saveSingleAssignForm.submitted && driverSelect.invalid
+              }">
+              <select style="width: 100%;" class="form-control" name="driver" id="driverName"
+                [(ngModel)]="singleAssignData.driverId" #driverSelect="ngModel"  [disabled]="!drivers.length" required>
+                <option disabled selected hidden [value]="null">
+                  Select Driver
+                </option>
+                <option *ngFor="let d of drivers" [value]="d.id">
+                  {{ d.name() }} </option>
+              </select>
+              <div *ngIf="saveSingleAssignForm.submitted && driverSelect.invalid" class="help-block">
+                <div class="small" *ngIf="driverSelect.errors.required">
+                  Please select driver
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-right">
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Bulk assign unidentified driving event modal -->
+<ng-template class="modal-dialog" #bulkAssignModal>
+  <div class="modal-content">
+    <div class="modal-header bg-primary">
+      <button type="button" class="close" (click)="closeBulkAssignModal()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h4 class="modal-title">Multiple Assign Unidentified Driving</h4>
+    </div>
+    <form class="form-horizontal" #saveBulkAssignForm="ngForm"
+      (ngSubmit)="saveBulkAssignForm.form.valid && onSaveBulkAssign()">
+      <div class="modal-body">
+        <div class="row margin-top-10">
+          <div class="col-sm-6">
+            <div [ngClass]="{
+                'has-error': saveBulkAssignForm.submitted && driverBulkSelect.invalid
+              }">
+              <label for="driverBulk">Assign</label>
+              <select style="width: 100%;" id="driverBulk" class="form-control" name="driverBulk" id="driverBulkName"
+                [(ngModel)]="bulkAssignData.driverId" #driverBulkSelect="ngModel" [disabled]="!drivers.length" required>
+                <option disabled selected hidden [value]="null">
+                  Select Driver
+                </option>
+                <option *ngFor="let d of drivers" [value]="d.id"> {{ d.name() }} </option>
+              </select>
+              <div *ngIf="saveBulkAssignForm.submitted && driverBulkSelect.invalid" class="help-block">
+                <div class="small" *ngIf="driverBulkSelect.errors.required">
+                  Please select driver
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div [ngClass]="{
+                'has-error': saveBulkAssignForm.submitted && noteBulk.invalid
+              }">
+              <label for="noteBulk">Note</label>
+              <textarea class="form-control" id="noteBulk" name="noteBulk" type="number"
+                [(ngModel)]="bulkAssignData.note" placeholder="Enter Note" #noteBulk="ngModel" required></textarea>
+              <div *ngIf="saveBulkAssignForm.submitted && noteBulk.invalid" class="help-block">
+                <div class="small" *ngIf="noteBulk.errors.required">
+                  Please enter note
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row margin-top-10">
+          <div class="col-12 mx-1">
+            <sa-datatable [options]="bulkUndefinedDrivingEventOption" #bulkUndefinedDrivingEventTable
+              tableClass="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th class="col-sm-1 select-checkbox">
+                    <input type="checkbox" class="form-check-input select-all-checkbox" name="selectAllCheckbox"
+                      [(ngModel)]="bulkSelectAllCheckbox" (change)="onSelectAllCheckBoxBulkUndefinedDrivingEvent()" />
+                    <span style="display: none;">Checkbox</span>
+                  </th>
+                  <th class="col-sm-1">Status</th>
+                  <th class="col-sm-2">Vin</th>
+                  <th class="col-sm-2">Vehicle</th>
+                  <th class="col-sm-1">Start / End Odometer</th>
+                  <th class="col-sm-1">Accumulated Miles</th>
+                  <th class="col-sm-1">Date</th>
+                  <th class="col-sm-1">Time</th>
+                </tr>
+              </thead>
+            </sa-datatable>
+          </div>
+        </div>
+        <div class="row" *ngIf="saveBulkAssignForm.submitted && !bulkAssignData.undefinedDrivingHistoryEvents.length">
+          <div class="col-12 px-1">
+            <small class="text-danger">
+              Please select at least one undefined driving event.
+            </small>
+          </div>
+        </div>
+        <div class="text-right margin-top-10">
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>

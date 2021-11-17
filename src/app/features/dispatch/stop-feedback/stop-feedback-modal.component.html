@@ -1,0 +1,43 @@
+<a (click)="showFeedbacksModal(feedbacksModal)" style="margin-left: 5px;">
+    <span><i class="fa fa-search"></i></span>
+</a>
+
+<ng-template #feedbacksModal>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Stop Feedback</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeFeedbacksModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <table class="responsive table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th class="col-sm-6">Name</th>
+                    <th class="col-sm-3">Value</th>
+                    <th class="col-sm-3">Synced</th>
+                </tr>
+            </thead>
+            <tbody *ngIf="!feedbacks || feedbacks.length === 0">
+                <tr>
+                    <td colspan="3">
+                        No feedback available
+                    </td>
+                </tr>
+            </tbody>
+            <tbody *ngIf="!!feedbacks && feedbacks.length > 0">
+                <tr *ngFor="let feedback of feedbacks">
+                    <td>
+                        {{feedback.name}}
+                    </td>
+                    <td>
+                        {{feedback.value}}
+                    </td>
+                    <td>
+                        {{feedback.isSynced()}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</ng-template>

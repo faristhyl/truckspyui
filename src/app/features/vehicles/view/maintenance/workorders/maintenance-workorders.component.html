@@ -1,0 +1,59 @@
+<div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">Work Orders</div>
+
+            <div class="panel-body no-padding override-child-dataTable-margin" *ngIf="tableColumns.length > 0">
+                <sa-datatable [options]="options" [dataTableColumns]="tableColumns"
+                    [dataTableId]="tableName" (selectedColumnsToSave)="saveSelectedColumns($event)"
+                    tableClass="table table-striped table-bordered table-hover" #ordersTable>
+                    <thead>
+                        <tr>
+                            <th class="col-sm-2">Work&nbsp;Order&nbsp;Num</th>
+                            <th class="col-sm-1">Status</th>
+                            <th class="col-sm-5">Issues</th>
+                            <th class="col-sm-2">Assigned&nbsp;To</th>
+                            <th class="col-sm-2">Created&nbsp;At</th>
+                        </tr>
+                    </thead>
+                    <thead class="filter-header">
+                        <tr>
+                            <td class="filter-valuable">
+                                <select style="width: 100%;" data-select-search="true" select2 name="workOrder" [(ngModel)]="filters.workOrderId"
+                                    (changedAction)="workOrderChanged($event)" [chooseOnTab]="true" [disabled]="!workOrdersLoaded"
+                                    [fixedWidthInHeader]="true">
+                                    <option style="color: lightgray;" value="">All Orders</option>
+                                    <option *ngFor="let workOrder of workOrders" [value]="workOrder.id">
+                                        {{workOrder.number}}
+                                    </option>
+                                </select>
+                            </td>
+                            <td class="filter-valuable">
+                                <select class="form-control" style="width: 100%;" name="status" [disabled]="!workOrdersLoaded"
+                                    [(ngModel)]="filters.status" (ngModelChange)='statusChanged($event)'>
+                                    <option style="color: lightgray;" value="">All Statuses</option>
+                                    <option *ngFor="let status of statuses"
+                                            [value]="status">
+                                        {{status}}
+                                    </option>
+                                </select>
+                            </td>
+                            <td></td>
+                            <td class="filter-valuable">
+                                <select style="width: 100%; max-width: 100%;" data-select-search="true" select2 name="user" [(ngModel)]="filters.userId"
+                                        (changedAction)="userChanged($event)" [chooseOnTab]="true" [disabled]="!usersLoaded"
+                                        [fixedWidthInHeader]="true">
+                                    <option style="color: lightgray;" value="">All Users</option>
+                                    <option *ngFor="let user of users" [value]="user.id">
+                                        {{user.searchAgainst}}
+                                    </option>
+                                </select>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                </sa-datatable>
+            </div>
+        </div>
+    </div>
+</div>

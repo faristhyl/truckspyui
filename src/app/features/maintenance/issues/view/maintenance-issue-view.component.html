@@ -1,0 +1,190 @@
+<div id="content">
+    <div class="row">
+        <sa-big-breadcrumbs [items]="['Maintenance', 'Issues', issue.number]" icon="cogs" class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+        </sa-big-breadcrumbs>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-5">
+            <form class="panel panel-default" #issueForm="ngForm">
+                <div class="panel-heading">Details</div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-4">Issue Num</label>
+                            <label class="col-sm-8">{{issue.number}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">Source</label>
+                            <label class="col-sm-8">
+                                <ng-container *ngIf="inspection?.id">
+                                    <i>Inspection</i> &nbsp; <a href="#/inspection/list/{{inspection.id}}/view">{{inspection.getNum()}}</a>
+                                </ng-container>
+                                <ng-container *ngIf="faultRule?.id">
+                                    <i>Fault Rule</i> &nbsp; {{faultRule?.mask?.formatted || "(unspecified)"}}
+                                </ng-container>
+                                <ng-container *ngIf="maintenanceItem?.id">
+                                    <i>Scheduled Maintenance Item</i> &nbsp; {{maintenanceItem.name}}
+                                </ng-container>
+                                <ng-container *ngIf="user?.id">
+                                    <i>User</i> &nbsp; {{user.name()}}
+                                </ng-container>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">Vehicle</label>
+                            <label class="col-sm-8">
+                                <a *ngIf="issue.vehicle && issue.vehicle.id"
+                                    href="#/vehicles/{{issue.vehicle.id}}/view">{{issue.vehicle.remoteId || '(unspecified)'}}</a>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">Created At</label>
+                            <label class="col-sm-8">{{issue.createdAt | timezoneHandler | date : 'yyyy-MM-dd, HH:mm:ss'}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">Status</label>
+                            <label class="col-sm-8">
+                                {{issue.status}}
+                                <ng-container *ngFor="let toStatus of allowedConversions[issue.status]">
+                                    &nbsp;|&nbsp;
+                                    <app-long-action-link [actionName]="toStatus" [actionParams]="[toStatus]"
+                                        (actionClicked)="doChangeStatus($event[0], $event[1])" [isDisabled]="statusChangeInitiated">
+                                    </app-long-action-link>
+                                </ng-container>
+                            </label>
+                        </div>
+                        <div class="form-group" *ngIf="issue.status">
+                            <label class="col-sm-4">Work Order</label>
+                            <label class="col-sm-8">
+                                <ng-container *ngIf="issue?.repairOrder?.id">
+                                    <a href="#/maintenance/workorders/{{issue.repairOrder.id}}/view">
+                                        {{issue.repairOrder.getNumber()}}
+                                    </a>
+                                    <ng-container *ngIf="issue.isAssignable()">
+                                        &nbsp;|&nbsp;
+                                        <app-long-action-link [actionName]="'Unassign'" [actionParams]="[issue.repairOrder]"
+                                            (actionClicked)="doUnassign($event[0], $event[1])">
+                                        </app-long-action-link>
+                                    </ng-container>
+                                </ng-container>
+
+                                <ng-container *ngIf="loaded && ordersLoaded && !issue?.repairOrder?.id && issue.isAssignable()">
+                                    <a class="action-link" (click)="assign(assignModal)">Assign</a>
+                                </ng-container>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">WO Created At</label>
+                            <label class="col-sm-8">
+                                {{issue?.repairOrder?.createdAt | timezoneHandler | date : 'yyyy-MM-dd, HH:mm:ss' | naHandler}}
+                            </label>
+                        </div>
+                        <div class="form-group" *ngIf="issue.isResolved()">
+                            <label class="col-sm-4">Driver Approved At</label>
+                            <label class="col-sm-8">
+                                {{issue.approvedAt | timezoneHandler | date : 'yyyy-MM-dd, HH:mm:ss' | naHandler}}
+                            </label>
+                        </div>
+                        <div class="form-group" *ngIf="issue.isResolved()">
+                            <label class="col-sm-4">Approved By</label>
+                            <label class="col-sm-8">
+                                <a *ngIf="!!issue.approvedBy?.id" href="#/drivers/{{issue.approvedBy.id}}/view">
+                                    {{issue.approvedBy.name() + ' (' + (issue.approvedBy.remoteId || '(unspecified)') + ')'}}
+                                </a>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4">Comments</label>
+                            <label class="col-sm-8">
+                                <ng-container *ngIf="!isUpdateComments">
+                                    <div *ngIf="issue.comments" style="overflow-x: auto;" class="margin-bottom-5">{{issue?.comments}}</div>
+                                    <a style="margin-left: 0;" class="action-link" (click)="beginEditComments()">{{issue.comments? 'Edit': 'Add'}}</a>
+                                </ng-container>
+                                <ng-container *ngIf="isUpdateComments">
+                                    <textarea class="input input-xs form-control margin-bottom-5" name="comments" style="width: 100%; max-width: 100%; padding: 5px;"
+                                        [(ngModel)]="editedComments" placeholder="Comments" rows="4">
+                                    </textarea>
+
+                                    <button class="btn btn-xs btn-default" (click)="cancelEditComments()">Cancel</button>
+                                    <button style="margin-left: 5px;" class="btn btn-xs btn-primary" (click)="onUpdateComments()">Save</button>
+                                </ng-container>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div class="panel panel-default" *ngIf="inspection?.id">
+                <div class="panel-heading">Information</div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        {{answer?.question?.text}} &nbsp; {{answer.description | naHandler}}
+                        <br /><br />
+                        <div class="image-section" *ngIf="!answerImageLoading && answerImage && answerImage !== 'error'">
+                            <img [src]="answerImage" />
+                        </div>
+                        
+                        <div class="image-section" *ngIf="!answerImageLoading && answerImage && answerImage === 'error'">
+                            <span> The answer does not have an uploaded image</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-md-12 col-lg-7">
+            <app-maintenance-issue-position [location]="issue.location"></app-maintenance-issue-position>
+        </div>
+
+    </div>
+</div>
+
+<ng-template #assignModal>
+    <div class="modal-header">
+        <button type="button" class="close" (click)="closeAssignModal()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Assign to Work Order</h4>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" #assignForm="ngForm" (ngSubmit)="assignForm.form.valid && doAssign()">
+            <div class="form-group" *ngIf="!ordersAvailable">
+                <div class="col-sm-12">
+                    <i class="fa fa-lg fa-info-circle" style="color: gray"></i> There are no assignable (not closed) Work Orders for this Vehicle, please just press <b>Assign</b> button and it will be created automatically.
+                </div>
+            </div>
+
+            <ng-container *ngIf="ordersAvailable">
+                <div class="form-group" *ngIf="ordersAvailable">
+                    <div class="col-sm-12">
+                        <i class="fa fa-lg fa-info-circle" style="color: gray"></i> You can assign the Issue to one of the assignable (not closed) Work Orders related to this Vehicle or create a new one.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-12" for="createNew">
+                        <input name="createNew" id="createNew" [(ngModel)]="assignData.createOrder"
+                            style="vertical-align: -2px;" type="checkbox">
+                        Create new Work Order
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4" style="text-align: left;" for="order">Work Order</label>
+                    <div class="col-sm-8">
+                        <select style="width: 100%;" data-select-search="true" select2 name="order" [(ngModel)]="assignData.orderId"
+                            (changedAction)="orderChanged($event)" [chooseOnTab]="true" [disabled]="assignData.createOrder">
+                            <option *ngFor="let order of orders" [value]="order.id">
+                                {{order.getNumber()}} ({{order.status}})
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </ng-container>
+
+            <div class="text-right">
+                <button class="btn btn-primary" type="submit">Assign</button>
+            </div>
+        </form>
+    </div>
+</ng-template>

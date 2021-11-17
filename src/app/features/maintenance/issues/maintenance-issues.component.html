@@ -1,0 +1,154 @@
+<div id="content">
+    <div class="row">
+        <sa-big-breadcrumbs [items]="['Maintenance', 'Issues']" icon="cogs" class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+        </sa-big-breadcrumbs>
+    </div>
+
+    <div class="row" *ngIf="statistics">
+        <div class="col-xs-12 col-sm-3">
+          <app-info-panel [iconName]="'question'" [iconColor]="'red'" [label]="'Unassigned&nbsp;Issues'"
+            [value]="statistics.unAssignedIssues" class="pull-left">
+          </app-info-panel>
+        </div>
+        <div class="col-xs-12 col-sm-3">
+          <app-info-panel [iconName]="'user'" [iconColor]="'black'" [label]="'Issues&nbsp;Assigned'"
+            [value]="statistics.assignedIssues" style="margin: 0 auto; display: table;">
+          </app-info-panel>
+        </div>
+        <div class="col-xs-12 col-sm-3">
+          <app-info-panel [iconName]="'check-square'" [iconColor]="'green'" [label]="'Resolved&nbsp;This&nbsp;Week'"
+            [value]="statistics.resolvedThisWeekIssues" style="margin: 0 auto; display: table;">
+          </app-info-panel>
+        </div>
+        <div class="col-xs-12 col-sm-3">
+          <app-info-panel [iconName]="'check-square'" [iconColor]="'gray'" [label]="'Resolved&nbsp;Last&nbsp;Week'"
+            [value]="statistics.resolvedLastWeekIssues" style="float: right;">
+          </app-info-panel>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Issues
+                    <div class="pull-right" *ngIf="vehiclesAvailable">
+                        <a class="action-link" (click)="addIssue(addIssueModal)">
+                            New Issue
+                        </a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-body no-padding override-child-dataTable-margin" *ngIf="tableColumns.length > 0">
+                    <sa-datatable [options]="options" [dataTableColumns]="tableColumns"
+                        [dataTableId]="tableName" (selectedColumnsToSave)="saveSelectedColumns($event)"
+                        tableClass="table table-striped table-bordered table-hover" #issuesTable>
+                        <thead>
+                            <tr>
+                                <th class="col-1_5">Issue&nbsp;Num</th>
+                                <th class="col-sm-2">Source</th>
+                                <th class="col-sm-1">Status</th>
+                                <th class="col-1_5">Vehicle</th>
+                                <th class="col-sm-4">Description</th>
+                                <th class="col-sm-1">Work&nbsp;Order</th>
+                                <th class="col-sm-1">Created&nbsp;At</th>
+                            </tr>
+                        </thead>
+                        <thead class="filter-header">
+                            <tr>
+                                <td class="filter-valuable">
+                                    <div class="btn-group" style="width: 100%;">
+                                        <input class="form-control" style="width: 100%;" placeholder="Issue Num Search..." name="issueNum" id="issueNum"
+                                            [(ngModel)]="filters.issueNum" (ngModelChange)="refreshDataTable()" type="text">
+                                        <span class="fa fa-times message-search-clear" (click)="clearIssueNum()"></span>
+                                    </div>
+                                </td>
+                                <td class="filter-valuable">
+                                    <select class="form-control" style="width: 100%;" name="sourceType"
+                                        [(ngModel)]="filters.issueSourceType" (ngModelChange)='sourceTypeChanged($event)'>
+                                        <option style="color: lightgray;" value="">All Sources</option>
+                                        <option *ngFor="let source of sources"
+                                                [value]="source">
+                                            {{source}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td class="filter-valuable">
+                                    <select class="form-control" style="width: 100%;" name="status"
+                                        [(ngModel)]="filters.issueStatus" (ngModelChange)='statusChanged($event)'>
+                                        <option style="color: lightgray;" value="">All Statuses</option>
+                                        <option *ngFor="let status of statuses"
+                                                [value]="status">
+                                            {{status}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td class="filter-valuable">
+                                    <select style="width: 100%;" data-select-search="true" select2 name="vehicle" [(ngModel)]="filters.vehicleId"
+                                        (changedAction)="vehicleChanged($event)" [chooseOnTab]="true" [disabled]="!vehiclesLoaded">
+                                        <option style="color: lightgray;" value="">All Vehicles</option>
+                                        <option *ngFor="let vehicle of vehicles" [value]="vehicle.id">
+                                            {{vehicle.remoteId || "(unspecified)"}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td></td>
+                                <td class="filter-valuable">
+                                    <select style="width: 100%;" data-select-search="true" select2 name="workOrder" [(ngModel)]="filters.workOrderId"
+                                        (changedAction)="workOrderChanged($event)" [chooseOnTab]="true" [disabled]="!workOrdersLoaded">
+                                        <option style="color: lightgray;" value="">All Orders</option>
+                                        <option *ngFor="let workOrder of workOrders" [value]="workOrder.id">
+                                            {{workOrder.getNumber()}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                    </sa-datatable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #addIssueModal>
+    <div class="modal-header">
+        <button type="button" class="close" (click)="closeAddIssueModal()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Create Issue</h4>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" #addIssueForm="ngForm" (ngSubmit)="addIssueForm.form.valid && doCreate()">
+            <div class="form-group">
+                <label class="col-sm-4" for="description">Description</label>
+                <div class="col-sm-8" [ngClass]="{ 'has-error': addIssueForm.submitted && descriptionInput.invalid }">
+                    <input class="input input-xs form-control" name="description" [(ngModel)]="issueData.description"
+                        #descriptionInput="ngModel" required>
+
+                    <div *ngIf="addIssueForm.submitted && descriptionInput.invalid" class="help-block">
+                        <div class="small" *ngIf="descriptionInput.errors.required">Please enter description
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-sm-4" style="text-align: left;" for="vehicle">Vehicle</label>
+                <div class="col-sm-8">
+                    <select style="width: 100%;" data-select-search="true" select2 name="vehicle" [(ngModel)]="issueData.vehicleId"
+                        (changedAction)="vehicleIdChanged($event)" [chooseOnTab]="true">
+                        <option *ngFor="let vehicle of vehicles" [value]="vehicle.id">
+                            {{vehicle.remoteId || "(unspecified)"}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <button class="btn btn-primary" type="submit">Create</button>
+            </div>
+        </form>
+    </div>
+</ng-template>

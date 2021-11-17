@@ -1,0 +1,165 @@
+<div id="content">
+    <div class="row">
+        <sa-big-breadcrumbs [items]="['Maintenance', 'Scheduled Dashboard']" icon="cogs" class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+        </sa-big-breadcrumbs>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="filter-block">
+                <h4 class="filter-block-title">Filters</h4>
+                <div class="row">
+                    <div class="col-sm-3 col-md-3 col-lg-3">
+                        <label for="dispatchGroup">Dispatch Group:</label>
+                        <select style="width: 100%" data-select-search="true" select2 #dispatchGroupSelect2
+                            name="dispatchGroup" id="dispatchGroup" [(ngModel)]="filters.dispatchGroupId"
+                            (changedAction)="onDispatchGroupIdChanged($event)"
+                            [chooseOnTab]="true"
+                            [disabled]="!dispatchGroups || dispatchGroups.length === 0">
+                            <option style="color: lightgray" value="">
+                                All Groups
+                            </option>
+                            <option *ngFor="let dispatchGroup of dispatchGroups" [value]="dispatchGroup.id">
+                                {{dispatchGroup.name}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3 col-md-3 col-lg-3">
+                        <label for="reportingProfileId">Reporting Profile:</label>
+                        <select style="width: 100%" data-select-search="true" select2 #reportingProfileSelect2
+                            name="reportingProfileId" id="reportingProfileId" [(ngModel)]="filters.reportingProfileId"
+                            (changedAction)="onReportingProfileIdChanged($event)"
+                            [chooseOnTab]="true"
+                            [disabled]="!reportingProfiles || reportingProfiles.length === 0">
+                            <option style="color: lightgray" value="">
+                                All Reporting Profiles
+                            </option>
+                            <option *ngFor="let reportingProfile of reportingProfiles" [value]="reportingProfile.id">
+                                {{reportingProfile.name}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3 col-md-3 col-lg-3">
+                        <label for="maintenanceGroupId">Maintenance Group:</label>
+                        <select style="width: 100%" data-select-search="true" select2 #maintenanceGroupSelect2
+                            name="maintenanceGroupId" id="maintenanceGroupId" [(ngModel)]="filters.maintenanceGroupId"
+                            (changedAction)="onMaintenanceGroupIdChanged($event)"
+                            [chooseOnTab]="true"
+                            [disabled]="!maintenanceGroups || maintenanceGroups.length === 0">
+                            <option style="color: lightgray" value="">
+                                All Groups
+                            </option>
+                            <option *ngFor="let group of _maintenanceGroups" [value]="group.id">
+                                {{group.name}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3 col-md-3 col-lg-3">
+                        <label for="showingFilterItem">Showing:</label>
+                        <select style="width: 100%" data-select-search="true" select2 #showingFilterItemSelect2
+                            name="showingFilterItem" id="showingFilterItem" [(ngModel)]="filters.showingFilterItem"
+                            (changedAction)="onShowingFilterItemChanged($event)"
+                            [chooseOnTab]="true"
+                            [disabled]="!showingFilterItems || showingFilterItems.length === 0">
+                            <option *ngFor="let showingFilterItem of showingFilterItems" [value]="showingFilterItem">
+                                {{showingFilterItem}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="table-container" [hidden]="!maintenanceGroups.length">
+                <div #tableBodyOverflow class="table-responsive">
+                    <table class="responsive table table-bordered table-hover m-0 inner-table" width="auto">
+                        <thead #tableHeader class="table-header">
+                            <tr>
+                                <th class="width-100px"></th>
+                                    <th *ngFor="let group of maintenanceGroups">{{ group.name }}</th> <!--group array -->
+                                </tr>
+                                <tr>
+                                    <th class="width-100px">
+                                        <div (click)="sortDashboard('remoteId')" class="sort-title">
+                                            Vehicle
+                                            <div class="sort-icon">
+                                                <ng-container [ngSwitch]="true">
+                                                    <ng-container *ngSwitchCase="sort.field === 'remoteId'">
+                                                        <i class="fa fa-sort-{{sort.order}}" aria-hidden="true"></i>
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchDefault>
+                                                        <i class="fa fa-sort" aria-hidden="true"></i>
+                                                    </ng-container>
+                                                </ng-container>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th class="p-0 w-100" *ngFor="let group of maintenanceGroups"> <!--group array -->
+                                        <table class="responsive table table-bordered table-hover m-0 inner-table">
+                                            <thead>
+                                                <tr style="height:67px!important">
+                                                    <!--items array -->
+                                                    <th *ngFor="let maintenanceItem of filterMaintenanceItemsByGroupId(group.id)"
+                                                        (click)="sortDashboard('remaining', maintenanceItem.name)">
+                                                        <div class='sort-title'>
+                                                            {{ maintenanceItem.name }} <br/>
+                                                            <ng-container *ngIf="maintenanceItem.type === maintenanceType.MILEAGE_BASED">
+                                                                every {{maintenanceItem.numberOf | number:'1.0':'en-US' }} miles
+                                                            </ng-container>
+                                                            <ng-container *ngIf="maintenanceItem.type === maintenanceType.PERIODIC_BASED">
+                                                                every {{maintenanceItem.numberOf | number:'1.0':'en-US' }} days
+                                                            </ng-container>
+                                                            <ng-container *ngIf="maintenanceItem.type === maintenanceType.ENGINE_HOURS_BASED">
+                                                                every {{maintenanceItem.numberOf | number:'1.0':'en-US' }} engine hours
+                                                            </ng-container>
+                                                            <div class="sort-icon">
+                                                                <ng-container [ngSwitch]="true">
+                                                                    <ng-container *ngSwitchCase="
+                                                                        sort.field === 'remaining' &&
+                                                                        sort.maintenanceItemName  === maintenanceItem.name
+                                                                    ">
+                                                                        <i class="fa fa-sort-{{sort.order}}" aria-hidden="true"></i>
+                                                                    </ng-container>
+                                                                    <ng-container *ngSwitchDefault>
+                                                                        <i class="fa fa-sort" aria-hidden="true"></i>
+                                                                    </ng-container>
+                                                                </ng-container>
+                                                            </div>
+                                                        </div>
+                                                    </th> 
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </th>
+                                </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngIf="!isGenerateTableBodyContent && !dashboardItems.length">
+                                <td>No available data</td>
+                            </tr>
+                            <tr *ngFor="let dashboardItem of dashboardItems; let dashboardItemIdx = index;">
+                                <td class="bd-top-1 width-100px"><a routerLink="/vehicles/{{dashboardItem.id}}/view">{{ dashboardItem.remoteId }}</a></td>
+                                <td class="p-0" *ngFor="let group of maintenanceGroups; let groupIdx = index;"> <!--group array -->
+                                    <table class="responsive table table-bordered table-hover m-0 inner-table" width="100%">
+                                        <tbody>
+                                            <tr>
+                                                <!--items array -->
+                                                <td *ngFor="let maintenanceItem of filterMaintenanceItemsByGroupId(group.id); let itemIdx = index;" 
+                                                    class="row-idx-{{dashboardItemIdx}} group-idx-{{groupIdx}} item-idx-{{itemIdx}} value-td">
+                                                    <!-- render value from component in getValueForCell -->
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
